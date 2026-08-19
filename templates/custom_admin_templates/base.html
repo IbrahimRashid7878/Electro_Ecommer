@@ -16,7 +16,7 @@
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <div class="logo">
-      <span class="logo-text">Custom Django Panel</span>
+      <span class="logo-text">fDjango Panel</span>
     </div>
     <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">✕</button>
   </div>
@@ -51,7 +51,7 @@
       <a href="{% url 'view_carts' %}" class="nav-link {% if request.resolver_match.url_name == 'view_carts' %}active{% endif %}">
         <span class="nav-icon"></span> Customer Carts
       </a>
-      <a href="{% url 'all_orders' %}" class="nav-link {% if request.resolver_match.url_name == 'all_orders' %}active{% endif %}">
+      <a href="{% url 'vendor_orders' %}" class="nav-link {% if request.resolver_match.url_name == 'vendor_orders' %}active{% endif %}">
         <span class="nav-icon"></span> Orders
       </a>
       <a href="{% url 'manage_coupons' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_coupons' or request.resolver_match.url_name == 'coupon_add' or request.resolver_match.url_name == 'coupon_edit' %}active{% endif %}">

@@ -94,6 +94,7 @@ urlpatterns = [
     path('panel/admin/vendors/reactivate/<int:user_id>/',          views.reactivate_vendor,    name='reactivate_vendor'),
     path('panel/admin/users/',                                     views.manage_users,         name='manage_users'),
     path('panel/admin/users/ban/<int:user_id>/',                   views.ban_user,             name='ban_user'),
+
     path('panel/admin/users/unban/<int:user_id>/',                 views.unban_user,           name='unban_user'),
     path('panel/admin/users/role/<int:user_id>/',                  views.change_user_role,     name='change_user_role'),
     
