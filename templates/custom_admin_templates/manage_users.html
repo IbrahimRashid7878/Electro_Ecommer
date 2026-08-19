@@ -1,0 +1,102 @@
+
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+ 
+{% block title %}Manage Users{% endblock %}
+{% block page_title %}Manage Users{% endblock %}
+ 
+{% block content %}
+ 
+<div class="page-header">
+  <h2>All Users</h2>
+  <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">← Back to dashboard</a>
+</div>
+ 
+<div class="card">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Joined</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td style="font-weight:500">{{ u.username }}</td>
+          <td>{{ u.email }}</td>
+ 
+          <!-- role -->
+          <td>
+            {% if u.role == 'admin' %}
+              <span class="badge badge-blue">Admin</span>
+            {% elif u.role == 'vendor' %}
+              <span class="badge badge-green">Vendor</span>
+            {% else %}
+              <span class="badge badge-amber">Customer</span>
+            {% endif %}
+          </td>
+ 
+          <td>{{ u.date_joined|date:"d M Y" }}</td>
+ 
+          <!-- active status -->
+          <td>
+            {% if u.is_active %}
+              <span class="badge badge-green">Active</span>
+            {% else %}
+              <span class="badge badge-red">Banned</span>
+            {% endif %}
+          </td>
+ 
+          <!-- actions -->
+          <td style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+ 
+            <!-- change role dropdown -->
+            <form method="post" action="{% url 'change_user_role' u.pk %}"
+                  style="display:flex; gap:6px; align-items:center;">
+              {% csrf_token %}
+              <select name="role" class="form-control" style="padding:4px 8px; font-size:0.8rem; height:32px;">
+                <option value="customer" {% if u.role == 'customer' %}selected{% endif %}>Customer</option>
+                <option value="vendor"   {% if u.role == 'vendor' %}selected{% endif %}>Vendor</option>
+                <option value="admin"    {% if u.role == 'admin' %}selected{% endif %}>Admin</option>
+              </select>
+              <button type="submit" class="btn btn-outline btn-sm">Set role</button>
+            </form>
+ 
+            <!-- ban/unban -->
+            {% if u.is_active %}
+              <!-- don't let admin ban themselves -->
+              {% if u.pk != request.user.pk %}
+              <form method="post" action="{% url 'ban_user' u.pk %}"
+                    onsubmit="return confirm('Ban {{ u.username }}?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Ban</button>
+              </form>
+              {% endif %}
+            {% else %}
+            <form method="post" action="{% url 'unban_user' u.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline btn-sm">Unban</button>
+            </form>
+            {% endif %}
+ 
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" style="text-align:center; padding:28px; color:var(--text-secondary);">
+            No users found.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+ 
+{% endblock %}

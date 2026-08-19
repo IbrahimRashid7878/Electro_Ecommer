@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Chat</title>
+    <style>
+        body { font-family: Arial; }
+
+        #chat-log {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        li { list-style: none; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<h2>Chat with {{ user.username }}</h2>
+
+<ul id="chat-log">
+    {% for msg in messages %}
+        <li>{{ msg.sender.username }}: {{ msg.content }}</li>
+    {% endfor %}
+</ul>
+
+<input id="chat-input" type="text" placeholder="Type message..." style="width:70%;">
+<button onclick="sendMessage()">Send</button>
+
+<script>
+const userId = "{{ user_id }}";
+
+const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+
+const socket = new WebSocket(
+    protocol + window.location.host + '/ws/chat/' + userId + '/'
+);
+
+socket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+
+    const li = document.createElement("li");
+    li.textContent = data.sender + ": " + data.message;
+
+    document.getElementById("chat-log").appendChild(li);
+
+    
+    const chatLog = document.getElementById("chat-log");
+    chatLog.scrollTop = chatLog.scrollHeight;
+};
+
+function sendMessage() {
+    const input = document.getElementById("chat-input");
+
+    if (input.value.trim() === "") return;
+
+    socket.send(JSON.stringify({
+        message: input.value
+    }));
+
+    input.value = "";
+}
+</script>
+
+</body>
+</html>

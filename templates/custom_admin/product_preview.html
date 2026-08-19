@@ -1,0 +1,1245 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="Responsive Admin &amp; Dashboard Template based on Bootstrap 5">
+	<meta name="author" content="AdminKit">
+	<meta name="keywords" content="adminkit, bootstrap, bootstrap 5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link rel="shortcut icon" href="{% static 'custom_admin/img/icons/custom_icon.webp' %}" />
+
+	<link rel="canonical" href="https://demo-basic.adminkit.io/" />
+
+	<title>Admin Panel</title>
+
+	<link href="{% static 'custom_admin/css/app.css' %}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background: #f4f6f9;
+		}
+
+		.container {
+			width: 95%;
+			margin: 30px auto;
+		}
+
+		.top-bar {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 15px;
+		}
+
+		input[type="text"] {
+			padding: 8px 12px;
+			width: 300px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+		}
+
+		button {
+			padding: 8px 14px;
+			border: none;
+			background: #dc3545;
+			color: white;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+
+		button:hover {
+			background: #c82333;
+		}
+
+		.table-wrapper {
+			max-height: 500px;
+			overflow-y: auto;
+			background: white;
+			border-radius: 8px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		thead {
+			background: #f1f3f5;
+			position: sticky;
+			top: 0;
+			z-index: 10;
+		}
+
+		th,
+		td {
+			padding: 12px;
+			font-size: 14px;
+			border-bottom: 1px solid #eee;
+		}
+
+		th {
+			color: #007bff;
+			cursor: pointer;
+		}
+
+		tbody tr:hover {
+			background: #f9fbff;
+		}
+
+		.badge {
+			padding: 4px 8px;
+			border-radius: 20px;
+			font-size: 12px;
+			font-weight: 500;
+		}
+
+		.badge-yes {
+			background: #d4edda;
+			color: #155724;
+		}
+
+		.badge-no {
+			background: #f8d7da;
+			color: #721c24;
+		}
+
+		.product-name {
+			color: #007bff;
+			text-decoration: none;
+			font-weight: 500;
+		}
+
+		.product-name:hover {
+			text-decoration: underline;
+		}
+	</style>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    /*
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    */
+    /* Header Navigation */
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 13px;
+        background-color: #fff;
+        padding: 15px 20px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+
+    .breadcrumb a {
+        color: #417690;
+        text-decoration: none;
+        margin: 0 5px;
+    }
+
+    .breadcrumb a:hover {
+        color: #036;
+    }
+
+    .breadcrumb span {
+        color: #999;
+        margin: 0 5px;
+    }
+
+    /* Main Form Container */
+    .form-container {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+
+    .form-header {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-bottom: 1px solid #ddd;
+        border-radius: 4px 4px 0 0;
+    }
+
+    .form-header h1 {
+        font-size: 24px;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .form-body {
+        padding: 20px;
+    }
+
+    /* Form Fieldset */
+    .fieldset {
+        margin-bottom: 30px;
+    }
+
+    .fieldset-title {
+        font-size: 13px;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #666;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Form Row */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 20px;
+    }
+
+    .form-row.full {
+        grid-template-columns: 1fr;
+    }
+
+    /* Form Group */
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .form-group label .required {
+        color: #dc3545;
+        margin-left: 3px;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="number"],
+    .form-group input[type="date"],
+    .form-group input[type="time"],
+    .form-group input[type="datetime-local"],
+    .form-group select,
+    .form-group textarea {
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 13px;
+        font-family: inherit;
+        background-color: #fff;
+        color: #333;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .form-group input[type="text"]:focus,
+    .form-group input[type="email"]:focus,
+    .form-group input[type="number"]:focus,
+    .form-group input[type="date"]:focus,
+    .form-group input[type="time"]:focus,
+    .form-group input[type="datetime-local"]:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #417690;
+        box-shadow: 0 0 0 3px rgba(65, 118, 144, 0.1);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+        font-family: monospace;
+    }
+
+    /* Help Text */
+    .help-text {
+        font-size: 11px;
+        color: #999;
+        margin-top: 5px;
+    }
+
+    /* Checkbox and Radio */
+    .checkbox-group,
+    .radio-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .checkbox-group input[type="checkbox"],
+    .radio-group input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+
+    .checkbox-group label,
+    .radio-group label {
+        margin: 0;
+        cursor: pointer;
+        font-weight: normal;
+    }
+
+    /* Image Upload */
+    .image-upload-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .image-preview {
+        margin-bottom: 15px;
+        max-width: 200px;
+    }
+
+    .image-preview img {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+    }
+
+    .image-upload-input {
+        padding: 10px 12px;
+        border: 2px dashed #ddd;
+        border-radius: 4px;
+        background-color: #fafafa;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+    }
+
+    .image-upload-input:hover {
+        border-color: #417690;
+        background-color: #f0f5fa;
+    }
+
+    /* Discount Section */
+    .discount-section {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-left: 4px solid #ffc107;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+
+    .discount-section .form-row {
+        gap: 20px;
+    }
+
+    /* Buttons */
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.15s ease-in-out;
+    }
+
+    .btn-primary {
+        background-color: #417690;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #2c5aa0;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        color: #333;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .action-btn {
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        border: 1px solid #ddd;
+        background-color: #fff;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transition: all 0.15s ease-in-out;
+    }
+
+    .action-btn:hover {
+        background-color: #f0f0f0;
+        border-color: #999;
+    }
+
+    .action-btn.delete {
+        color: #dc3545;
+    }
+
+    .action-btn.delete:hover {
+        background-color: #ffe6e6;
+    }
+
+    /* Error Messages */
+    .error-message {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .form-group.has-error input,
+    .form-group.has-error select,
+    .form-group.has-error textarea {
+        border-color: #dc3545;
+    }
+
+    /* Success Message */
+    .success-message {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 12px 20px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+
+    /* Info Box */
+    .info-box {
+        background-color: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+        padding: 12px 20px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        font-size: 13px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+
+</head>
+
+<body>
+	<div class="wrapper">
+\		<nav id="sidebar" class="sidebar js-sidebar">
+			<div class="sidebar-content js-simplebar">
+				<a class="sidebar-brand" href="index.html">
+          <span class="align-middle">AdminKit</span>
+        </a>
+
+				<ul class="sidebar-nav">
+					<li class="sidebar-header">
+						Pages
+					</li>
+
+					<li class="sidebar-item active">
+						<a class="sidebar-link" href="{% url 'dashboard' %}">
+              <i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Dashboard</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="pages-profile.html">
+              <i class="align-middle" data-feather="user"></i> <span class="align-middle">Profile</span>
+            </a>
+					</li>
+
+					<!-- <li class="sidebar-item">
+						<a class="sidebar-link" href="pages-sign-in.html">
+              <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Sign In</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="pages-sign-up.html">
+              <i class="align-middle" data-feather="user-plus"></i> <span class="align-middle">Sign Up</span>
+            </a>
+					</li> -->
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="{% url 'product_view' %}">
+              <i class="align-middle" data-feather="book"></i> <span class="align-middle">Products</span>
+            </a>
+					</li>
+
+					<!-- <li class="sidebar-header">
+						Tools & Components
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="ui-buttons.html">
+              <i class="align-middle" data-feather="square"></i> <span class="align-middle">Buttons</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="ui-forms.html">
+              <i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Forms</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="ui-cards.html">
+              <i class="align-middle" data-feather="grid"></i> <span class="align-middle">Cards</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="ui-typography.html">
+              <i class="align-middle" data-feather="align-left"></i> <span class="align-middle">Typography</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="icons-feather.html">
+              <i class="align-middle" data-feather="coffee"></i> <span class="align-middle">Icons</span>
+            </a>
+					</li>
+
+					<li class="sidebar-header">
+						Plugins & Addons
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="charts-chartjs.html">
+              <i class="align-middle" data-feather="bar-chart-2"></i> <span class="align-middle">Charts</span>
+            </a>
+					</li>
+
+					<li class="sidebar-item">
+						<a class="sidebar-link" href="maps-google.html">
+              <i class="align-middle" data-feather="map"></i> <span class="align-middle">Maps</span>
+            </a>
+					</li> -->
+				</ul>
+
+				<!-- <div class="sidebar-cta">
+					<div class="sidebar-cta-content">
+						<strong class="d-inline-block mb-2">Upgrade to Pro</strong>
+						<div class="mb-3 text-sm">
+							Are you looking for more components? Check out our premium version.
+						</div>
+						<div class="d-grid">
+							<a href="upgrade-to-pro.html" class="btn btn-primary">Upgrade to Pro</a>
+						</div>
+					</div>
+				</div> -->
+			</div>
+		</nav>
+
+
+
+
+<main class="content">
+
+<div class="container">
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumb">
+        <a href="{% url 'dashboard' %}">Home</a>
+        <span>›</span>
+        <a href="{% url 'product_view' %}">Products</a>
+        <span>›</span>
+        <span>{{ product.name }}</span>
+    </div>
+
+    <!-- Success Message -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success-message">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Main Form Container -->
+    <div class="form-container">
+        <div class="form-header">
+            <h1>Product Details: {{ product.name }}</h1>
+        </div>
+
+        <div class="form-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Basic Information Section -->
+                <div class="fieldset">
+                    <div class="fieldset-title">Basic Information</div>
+
+                    <!-- Domain and Site -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_domain">
+                                Domain
+                                <span class="required">*</span>
+                            </label>
+                            <select id="id_domain" name="domain" required>
+                                <option value="">---------</option>
+                                {% for site in sites %}
+                                    <option value="{{ site.id }}" {% if product.domain.id == site.id %}selected{% endif %}>
+                                        {{ site.domain }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if form.domain.errors %}
+                                <div class="error-message">{{ form.domain.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_site">
+                                Site
+                                <span class="required">*</span>
+                            </label>
+                            <select id="id_site" name="site" required>
+                                <option value="">---------</option>
+                                {% for site in sites %}
+                                    <option value="{{ site.id }}" {% if product.site.id == site.id %}selected{% endif %}>
+                                        {{ site.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if form.site.errors %}
+                                <div class="error-message">{{ form.site.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Name and Category -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_name">
+                                Product Name
+                                <span class="required">*</span>
+                            </label>
+                            <input type="text" id="id_name" name="name" value="{{ product.name }}" required>
+                            {% if form.name.errors %}
+                                <div class="error-message">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_category">
+                                Category
+                                <span class="required">*</span>
+                            </label>
+                            <select id="id_category" name="category" required>
+                                <option value="">---------</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if product.category.errors %}
+                                <div class="error-message">{{ product.category.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Company and Price -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_company">Company</label>
+                            <input type="text" id="id_company" name="company" value="{{ product.company }}">
+                            {% if product.company.errors %}
+                                <div class="error-message">{{ product.company.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_price">
+                                Price
+                                <span class="required">*</span>
+                            </label>
+                            <input type="number" id="id_price" name="price" value="{% if product.has_discount %}{{ product.discounted_price }}{% else %}{{ product.price }}{% endif %}" step="0.01" required>
+                            {% if product.price.errors %}
+                                <div class="error-message">{{ product.price.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Section -->
+                <div class="fieldset">
+                    <div class="fieldset-title">Product Image</div>
+
+                    <div class="form-row full">
+                        <div class="form-group image-upload-group">
+                            <label for="id_image">
+                                Image
+                                <span class="required">*</span>
+                            </label>
+
+                            {% if product.image %}
+                                <div class="image-preview">
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                </div>
+                            {% endif %}
+
+                            <input type="file" id="id_image" name="image" accept="image/*" class="image-upload-input">
+                            <div class="help-text">
+                                {% if product.image %}
+                                    Current image: {{ product.image.name }}
+                                {% else %}
+                                    No image uploaded yet
+                                {% endif %}
+                            </div>
+                            {% if product.image.errors %}
+                                <div class="error-message">{{ product.image.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description Section -->
+                <div class="fieldset">
+                    <div class="fieldset-title">Description</div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="id_description">Description</label>
+                            <textarea id="id_description" name="description">{{ product.description }}</textarea>
+                            <div class="help-text">Detailed product description for customers</div>
+                            {% if product.description.errors %}
+                                <div class="error-message">{{ product.description.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Discount Section -->
+                <div class="fieldset">
+                    <div class="fieldset-title">Discount Settings</div>
+
+                    <div class="discount-section">
+                        <div class="form-row">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="id_has_discount" name="has_discount" 
+                                    {% if product.has_discount %}checked{% endif %}>
+                                <label for="id_has_discount">Enable Discount</label>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="id_discount_percent">Discount Percentage (%)</label>
+                                <input type="number" id="id_discount_percent" name="discount_percent" 
+                                    value="{{ product.discount_percent }}" min="0" max="100">
+                                <div class="help-text">Enter discount percentage (0-100)</div>
+                                {% if form.discount_percent.errors %}
+                                    <div class="error-message">{{ product.discount_percent.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_is_new">
+                                    <input type="checkbox" id="id_is_new" name="is_new" 
+                                        {% if product.is_new %}checked{% endif %}>
+                                    Mark as New Product
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="id_discount_start_date">Discount Start Date</label>
+                                <input type="datetime-local" id="id_discount_start_date" name="discount_start_date" 
+                                    value="{% if product.discount_start_date %}{{ product.discount_start_date|date:'Y-m-d\\TH:i' }}{% endif %}">
+                                <div class="help-text">When the discount should start</div>
+                                
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_discount_end_date">Discount End Date</label>
+                                <input type="datetime-local" id="id_discount_end_date" name="discount_end_date" 
+                                    value="{% if product.discount_end_date %}{{ product.discount_end_date|date:'Y-m-d\\TH:i' }}{% endif %}">
+                                <div class="help-text">When the discount should end</div>
+                                
+                            </div>
+                        </div>
+
+                        {% if product.discount_active %}
+                            <div class="info-box">
+                                Discount is currently active. Discounted price: <strong>RS {{ product.discounted_price }}</strong>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Button Group -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
+                        <span></span> Save Changes
+                    </button>
+                    <a href="{% url 'product_view' %}" class="btn btn-secondary">
+                        <span></span> Back to List
+                    </a>
+                    <button type="button" class="btn btn-danger" onclick="if(confirm('confirm deletion of this product?')) { document.getElementById('delete-form').submit(); }">
+                        <span></span> Delete Product
+                    </button>
+                </div>
+            </form>
+
+            <!-- Hidden Delete Form -->
+            <form id="delete-form" method="post" action="{% url 'product_delete' product.id %}" style="display: none;">
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<footer class="footer">
+				<div class="container-fluid">
+					<div class="row text-muted">
+						<div class="col-6 text-start">
+							<p class="mb-0">
+								<a class="text-muted" href="https://adminkit.io/" target="_blank"><strong>AdminKit</strong></a> - <a class="text-muted" href="https://adminkit.io/" target="_blank"><strong>Bootstrap Admin Template</strong></a>								&copy;
+							</p>
+						</div>
+						<div class="col-6 text-end">
+							<ul class="list-inline">
+								<li class="list-inline-item">
+									<a class="text-muted" href="https://adminkit.io/" target="_blank">Support</a>
+								</li>
+								<li class="list-inline-item">
+									<a class="text-muted" href="https://adminkit.io/" target="_blank">Help Center</a>
+								</li>
+								<li class="list-inline-item">
+									<a class="text-muted" href="https://adminkit.io/" target="_blank">Privacy</a>
+								</li>
+								<li class="list-inline-item">
+									<a class="text-muted" href="https://adminkit.io/" target="_blank">Terms</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</footer>
+</main>
+		</div>
+        
+	</div>
+    
+</div>
+
+
+	<script src="{% static 'custom_admin/js/app.js' %}"></script>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			var ctx = document.getElementById("chartjs-dashboard-line").getContext("2d");
+			var gradient = ctx.createLinearGradient(0, 0, 0, 225);
+			gradient.addColorStop(0, "rgba(215, 227, 244, 1)");
+			gradient.addColorStop(1, "rgba(215, 227, 244, 0)");
+			// Line chart
+			new Chart(document.getElementById("chartjs-dashboard-line"), {
+				type: "line",
+				data: {
+					labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+					datasets: [{
+						label: "Sales ($)",
+						fill: true,
+						backgroundColor: gradient,
+						borderColor: window.theme.primary,
+						data: [
+							2115,
+							1562,
+							1584,
+							1892,
+							1587,
+							1923,
+							2566,
+							2448,
+							2805,
+							3438,
+							2917,
+							3327
+						]
+					}]
+				},
+				options: {
+					maintainAspectRatio: false,
+					legend: {
+						display: false
+					},
+					tooltips: {
+						intersect: false
+					},
+					hover: {
+						intersect: true
+					},
+					plugins: {
+						filler: {
+							propagate: false
+						}
+					},
+					scales: {
+						xAxes: [{
+							reverse: true,
+							gridLines: {
+								color: "rgba(0,0,0,0.0)"
+							}
+						}],
+						yAxes: [{
+							ticks: {
+								stepSize: 1000
+							},
+							display: true,
+							borderDash: [3, 3],
+							gridLines: {
+								color: "rgba(0,0,0,0.0)"
+							}
+						}]
+					}
+				}
+			});
+		});
+	</script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// Pie chart
+			new Chart(document.getElementById("chartjs-dashboard-pie"), {
+				type: "pie",
+				data: {
+					labels: ["Chrome", "Firefox", "IE"],
+					datasets: [{
+						data: [4306, 3801, 1689],
+						backgroundColor: [
+							window.theme.primary,
+							window.theme.warning,
+							window.theme.danger
+						],
+						borderWidth: 5
+					}]
+				},
+				options: {
+					responsive: !window.MSInputMethodContext,
+					maintainAspectRatio: false,
+					legend: {
+						display: false
+					},
+					cutoutPercentage: 75
+				}
+			});
+		});
+	</script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			// Bar chart
+			new Chart(document.getElementById("chartjs-dashboard-bar"), {
+				type: "bar",
+				data: {
+					labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+					datasets: [{
+						label: "This year",
+						backgroundColor: window.theme.primary,
+						borderColor: window.theme.primary,
+						hoverBackgroundColor: window.theme.primary,
+						hoverBorderColor: window.theme.primary,
+						data: [54, 67, 41, 55, 62, 45, 55, 73, 60, 76, 48, 79],
+						barPercentage: .75,
+						categoryPercentage: .5
+					}]
+				},
+				options: {
+					maintainAspectRatio: false,
+					legend: {
+						display: false
+					},
+					scales: {
+						yAxes: [{
+							gridLines: {
+								display: false
+							},
+							stacked: false,
+							ticks: {
+								stepSize: 20
+							}
+						}],
+						xAxes: [{
+							stacked: false,
+							gridLines: {
+								color: "transparent"
+							}
+						}]
+					}
+				}
+			});
+		});
+	</script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			var markers = [{
+					coords: [31.230391, 121.473701],
+					name: "Shanghai"
+				},
+				{
+					coords: [28.704060, 77.102493],
+					name: "Delhi"
+				},
+				{
+					coords: [6.524379, 3.379206],
+					name: "Lagos"
+				},
+				{
+					coords: [35.689487, 139.691711],
+					name: "Tokyo"
+				},
+				{
+					coords: [23.129110, 113.264381],
+					name: "Guangzhou"
+				},
+				{
+					coords: [40.7127837, -74.0059413],
+					name: "New York"
+				},
+				{
+					coords: [34.052235, -118.243683],
+					name: "Los Angeles"
+				},
+				{
+					coords: [41.878113, -87.629799],
+					name: "Chicago"
+				},
+				{
+					coords: [51.507351, -0.127758],
+					name: "London"
+				},
+				{
+					coords: [40.416775, -3.703790],
+					name: "Madrid "
+				}
+			];
+			var map = new jsVectorMap({
+				map: "world",
+				selector: "#world_map",
+				zoomButtons: true,
+				markers: markers,
+				markerStyle: {
+					initial: {
+						r: 9,
+						strokeWidth: 7,
+						stokeOpacity: .4,
+						fill: window.theme.primary
+					},
+					hover: {
+						fill: window.theme.primary,
+						stroke: window.theme.primary
+					}
+				},
+				zoomOnScroll: false
+			});
+			window.addEventListener("resize", () => {
+				map.updateSize();
+			});
+		});
+	</script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			var date = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+			var defaultDate = date.getUTCFullYear() + "-" + (date.getUTCMonth() + 1) + "-" + date.getUTCDate();
+			document.getElementById("datetimepicker-dashboard").flatpickr({
+				inline: true,
+				prevArrow: "<span title=\"Previous month\">&laquo;</span>",
+				nextArrow: "<span title=\"Next month\">&raquo;</span>",
+				defaultDate: defaultDate
+			});
+		});
+	</script>
+
+    <script>
+		$(document).ready(function () {
+
+			// Select All
+			$("#selectAll").click(function () {
+				$(".rowCheckbox").prop('checked', this.checked);
+			});
+
+			// Search (Reload page via AJAX)
+			$("#searchInput").on("keyup", function () {
+				let value = encodeURIComponent($(this).val());
+				window.location.href = "?search=" + value;
+			});
+
+			// Sorting
+			$(".sortable").click(function () {
+				let sortField = $(this).data("sort");
+				window.location.href = "?sort=" + sortField;
+			});
+
+
+
+			// // Bulk Delete
+			// $("#bulkDeleteBtn").click(function(){
+
+			//     let selected = [];
+
+			//     $(".rowCheckbox:checked").each(function(){
+			//         selected.push($(this).val());
+			//     });
+
+			//     if(selected.length === 0){
+			//         alert("No products selected.");
+			//         return;
+			//     }
+
+			function getCookie(name) {
+				let cookieValue = null;
+				if (document.cookie && document.cookie !== '') {
+					const cookies = document.cookie.split(';');
+					for (let i = 0; i < cookies.length; i++) {
+						let cookie = cookies[i].trim();
+						if (cookies[i].substring(0, name.length + 1) === (name + '=')) {
+							cookieValue = decodeURIComponent(cookies[i].substring(name.length + 1));
+							break;
+						}
+					}
+				}
+				return cookieValue;
+			}
+
+			let csrftoken = getCookie('csrftoken');
+
+			$.ajax({
+				url: "{% url 'bulk_delete_products' %}",
+				method: "POST",
+				headers: {
+					"X-CSRFToken": csrftoken
+				},
+				data: {
+					ids: selected
+				},
+				success: function (response) {
+					alert("Products deleted successfully.");
+					location.reload();
+				},
+				error: function (error) {
+					alert("Error deleting products.");
+				}
+			});
+		});
+		// });
+	</script>
+
+	<script>
+		document.getElementById("bulkDeleteForm").addEventListener("submit", function (e) {
+
+			let selected = [];
+
+			document.querySelectorAll(".rowCheckbox:checked").forEach(cb => {
+				selected.push(cb.value);
+			});
+
+			if (selected.length === 0) {
+				alert("Please select products first");
+				e.preventDefault();
+				return;
+			}
+
+			let input = document.createElement("input");
+			input.type = "hidden";
+			input.name = "ids";
+			input.value = selected.join(",");
+
+			this.appendChild(input);
+		});
+	</script>
+
+
+</body>
+
+</html>

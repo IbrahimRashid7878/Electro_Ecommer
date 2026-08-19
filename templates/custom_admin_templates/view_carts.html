@@ -1,0 +1,118 @@
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+
+{% block title %}Customer Carts{% endblock %}
+{% block page_title %}Customer Carts{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>Customer Carts</h2>
+</div>
+
+<!-- summary stat -->
+<div class="stats-grid" style="margin-bottom:24px;">
+  <div class="stat-card">
+    <p class="stat-label">Users with items in cart</p>
+    <p class="stat-value">{{ total_carts }}</p>
+    <p class="stat-sub">Active carts</p>
+  </div>
+</div>
+
+{% if not cart_data %}
+  <div class="card" style="text-align:center; padding:40px;">
+    <p style="color:var(--text-secondary); font-size:1.1rem;">
+      No items in any cart right now.
+    </p>
+  </div>
+
+{% else %}
+
+  <!-- one card per user -->
+  {% for cart in cart_data %}
+  <div class="card" style="margin-bottom:20px;">
+
+    <!-- user header -->
+    <div class="page-header" style="margin-bottom:14px;">
+      <div>
+        <p class="card-title" style="margin:0;">
+          👤 {{ cart.user.username }}
+        </p>
+        <p style="margin:4px 0 0; color:var(--text-secondary); font-size:0.85rem;">
+          {{ cart.user.email }} — {{ cart.count }} product{{ cart.count|pluralize }} in cart
+        </p>
+      </div>
+      <div style="text-align:right;">
+        <p style="font-weight:700; font-size:1.1rem; color:var(--accent);">
+          Rs {{ cart.total }}
+        </p>
+        <p style="margin:2px 0 0; color:var(--text-secondary); font-size:0.8rem;">
+          Cart total
+        </p>
+      </div>
+    </div>
+
+    <!-- items table for this user -->
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Unit Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart.items %}
+          <tr>
+            <td>
+              {% if item.product.image %}
+                <img src="{{ item.product.image.url }}"
+                     style="width:45px; height:45px; object-fit:cover; border-radius:6px;">
+              {% else %}
+                <div style="width:45px; height:45px; background:#f0f0f0;
+                            border-radius:6px; display:flex; align-items:center;
+                            justify-content:center;">📦</div>
+              {% endif %}
+            </td>
+            <td style="font-weight:500;">{{ item.product.name }}</td>
+            <td>{{ item.product.category.name }}</td>
+            <td>
+              {% if item.product.discount_active %}
+                <span style="text-decoration:line-through; color:#999; font-size:0.85rem;">
+                  Rs {{ item.product.price }}
+                </span>
+                <span style="color:#22c55e; font-weight:600; display:block;">
+                  Rs {{ item.product.discounted_price }}
+                </span>
+              {% else %}
+                Rs {{ item.product.price }}
+              {% endif %}
+            </td>
+            <td>{{ item.quantity }}</td>
+            <td style="font-weight:600;">Rs {{ item.subtotal }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5" style="text-align:right; padding:12px; font-weight:600;">
+              Cart Total
+            </td>
+            <td style="padding:12px; font-weight:700; color:var(--accent);">
+              Rs {{ cart.total }}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+  </div>
+  {% endfor %}
+
+{% endif %}
+
+{% endblock %}

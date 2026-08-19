@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<li></li>
+
+<div class="container py-5">
+
+    <!-- Page Title -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">🛒 Your Cart</h2>
+        <p class="text-muted">Review your items before checkout</p>
+    </div>
+
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-lg-12">
+
+            <table class="table align-middle table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Product</th>
+                        <th scope="col">Name & Category</th>
+                        <th scope="col" class="text-center">Quantity</th>
+                        <th scope="col" class="text-center">Price</th>
+                        <th scope="col" class="text-center">Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <!-- Product Image -->
+                        <td>
+                            <img src="{{ item.product.image.url|default:'https://via.placeholder.com/100' }}"
+                                 alt="{{ item.product.name }}"
+                                 class="img-fluid rounded"
+                                 style="max-width: 100px;">
+                        </td>
+
+                        <!-- Name & Category -->
+                        <td>
+                            <strong>{{ item.product.name }}</strong><br>
+                            <small class="text-muted">{{ item.product.category.name }}</small>
+                        </td>
+
+                        <!-- Quantity -->
+                        <td class="text-center">
+                            <form method="POST" action="{% url 'update_cart' item.id %}">
+                                {% csrf_token %}
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
+                                       class="form-control text-center mb-1">
+                                <button type="submit" class="btn btn-outline-primary btn-sm w-100">Update</button>
+                            </form>
+                        </td>
+
+                        <!-- Price -->
+                        <td class="text-center fw-bold">
+                            RS {{ item.subtotal }}
+                        </td>
+
+                        <!-- Remove -->
+                        <td class="text-center">
+                            <form method="POST" action="{% url 'remove_from_cart' item.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+            <!-- Continue Shopping -->
+            <a href="{% url 'shop' %}" class="btn btn-custom btn-outline-secondary mt-3">
+                ← Continue Shopping
+            </a>
+
+        </div>
+    </div>
+
+<!-- Order Summary -->
+<div class="row mt-4">
+  <div class="col-lg-4 offset-lg-8">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+
+        <h5 class="fw-bold mb-4">Order Summary</h5>
+
+        <!-- Cart Items -->
+        {% for item in cart_items %}
+        <div class="d-flex justify-content-between mb-2 align-items-center">
+          <div>
+            <strong>{{ item.product.name }}</strong><br>
+            <small class="text-muted">
+              RS {{ item.product.discounted_price }} × {{ item.quantity }}
+            </small>
+          </div>
+          <div class="fw-bold">
+            RS {{ item.subtotal }}
+          </div>
+        </div>
+        {% endfor %}
+
+        <hr>
+
+        <!-- Subtotal -->
+        <div class="d-flex justify-content-between mb-2">
+          <span>Subtotal</span>
+          <span class="fw-bold">RS {{ cart_total }}</span>
+        </div>
+
+        <!-- Coupon Form -->
+        <form method="POST" class="mt-3">
+          {% csrf_token %}
+
+          <label class="text-black h6" for="coupon">Coupon</label>
+          <p class="small text-muted">Enter your coupon code if you have one.</p>
+
+          <div class="row g-2">
+            <div class="col-8">
+              <input
+                type="text"
+                class="form-control py-2"
+                id="coupon"
+                placeholder="Coupon Code"
+                name="coupon_code"
+              >
+            </div>
+            <div class="col-4">
+              <button type="submit" class="btn btn-custom btn-dark w-100">
+                Apply
+              </button>
+            </div>
+          </div>
+
+          {% if message %}
+          <div class="alert alert-info mt-3 py-2">
+            {{ message }}
+          </div>
+          {% endif %}
+        </form>
+
+        <hr>
+
+        <!-- Delivery -->
+        <div class="d-flex justify-content-between mb-2">
+          <span>Delivery</span>
+          <span class="text-success fw-bold">Free</span>
+        </div>
+
+        <!-- Discount -->
+        {% if discount %}
+        <div class="d-flex justify-content-between mb-2 text-success">
+          <span>Discount</span>
+          <span>- RS {{ discount }}</span>
+        </div>
+        {% endif %}
+
+        <hr>
+
+        <!-- Final Total -->
+        <div class="d-flex justify-content-between fs-5 fw-bold mb-4">
+          <span>Total</span>
+          <span>RS {{ final_total }}</span>
+        </div>
+
+        <button type="button" class="btn btn-custom btn-dark w-100 py-2" data-toggle="modal" data-target="#exampleModal">
+  Proceed to Checkout
+</button>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Submit Details</h5>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'checkout' %}">
+							{% csrf_token %}
+						<div class="billing-details">
+							<div class="section-title">
+								<h3 class="title">Billing address</h3>
+							</div>
+							<div class="form-group">
+							<input class="input" type="text" name="first_name" placeholder="First Name">
+
+							</div>
+							<div class="form-group">
+								<input class="input" type="text" name="last_name" placeholder="Last Name">
+			        </div>
+							<div class="form-group">
+								<input class="input" type="email" name="email" placeholder="Email">
+							</div>
+							<div class="form-group">
+								<input class="input" type="text" name="address" placeholder="Address">
+							</div>
+							<div class="form-group">
+								<input class="input" type="text" name="city" placeholder="City">
+							</div>
+							<div class="form-group">
+								<input class="input" type="text" name="country" placeholder="Country">
+							</div>
+							<div class="form-group">
+								<input class="input" type="text" name="zip_code" placeholder="ZIP Code">
+							</div>
+							<div class="form-group">
+								<input class="input" type="tel" name="phone" placeholder="Telephone">
+							</div>
+            </div>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary order-submit">Place order</button>
+      </div>
+    </div>
+  </div>
+  
+</div>
+</form>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    {% else %}
+        <p class="text-muted text-center">Your cart is empty. <a href="{% url 'shop' %}">Shop now!</a></p>
+    {% endif %}
+
+</div>
+
+
+
+{% endblock %}

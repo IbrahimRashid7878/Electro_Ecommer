@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0">❤️ My Wishlist</h3>
+        <span class="badge bg-danger">
+            {{ items|length }} item{{ items|length|pluralize }}
+        </span>
+    </div>
+
+    {% if items %}
+    <div class="row g-4">
+
+        {% for item in items %}
+
+    <div class="col-lg-3 col-md-4 col-sm-6">
+
+            <div class="card h-100 shadow-sm position-relative">
+
+                <!-- Badges -->
+                {% if item.is_new %}
+                <span class="badge bg-success position-absolute top-0 start-0 m-2">
+                    New
+                </span>
+                {% endif %}
+
+                {% if item.has_discount %}
+                <span class="badge bg-danger position-absolute top-0 end-0 m-2">
+                    -{{ item.discount_percent }}%
+                </span>
+                {% endif %}
+
+                <!-- Product Image -->
+                <img src="{{ item.image.url }}"
+                     class="card-img-top"
+                     alt="{{ item.name }}"
+                     style="height: 200px; object-fit: cover;">
+
+                <div class="card-body d-flex flex-column">
+
+                    <!-- Product Info -->
+                    <h6 class="card-title mb-1">{{ item.name }}</h6>
+
+                    <small class="text-muted">
+                        {{ item.category.name }} · {{ item.company }}
+                    </small>
+
+                    <!-- Price -->
+                    <div class="mt-2">
+                        {% if item.has_discount %}
+                            <span class="fw-bold text-danger">
+                                Rs. {{ item.discounted_price|floatformat:2 }}
+                            </span>
+                            <small class="text-muted text-decoration-line-through ms-2">
+                                Rs. {{ item.price }}
+                            </small>
+                        {% else %}
+                            <span class="fw-bold">
+                                Rs. {{ item.price }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="mt-auto d-flex justify-content-between align-items-center pt-3">
+
+                        
+                        <a href="{% url 'product' %}?id={{ item.id }}"
+                           class="btn btn-sm btn-outline-primary">
+                            View
+                        </a>
+
+                        <a href="{% url 'remove_from_wishlist' item.id %}"
+                           class="btn btn-sm btn-outline-danger"
+                           title="Remove from wishlist">
+                            <i class="fa fa-trash"></i>
+                        </a>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+    <!-- Empty Wishlist -->
+    <div class="text-center py-5">
+        <i class="fa fa-heart-o fa-3x text-muted mb-3"></i>
+        <h5 class="fw-semibold">Your wishlist is empty</h5>
+        <p class="text-muted">
+            Browse products and tap ❤️ to save your favorites.
+        </p>
+        <a href="{% url 'shop' %}" class="btn btn-danger mt-3">
+            Continue Shopping
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

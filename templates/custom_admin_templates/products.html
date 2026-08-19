@@ -1,0 +1,123 @@
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+ 
+{% block title %}My Products{% endblock %}
+{% block page_title %}My Products{% endblock %}
+ 
+{% block content %}
+ 
+<!-- top bar: heading + add button -->
+<div class="page-header">
+  <h2>All Products</h2>
+  <a href="{% url 'panel_product_add' %}" class="btn btn-primary">+ Add Product</a>
+</div>
+ 
+<!-- if no products exist yet -->
+{% if not products %}
+  <div class="card" style="text-align:center; padding: 40px;">
+    <p style="color: var(--text-secondary); font-size: 1.1rem;">No products yet.</p>
+    <a href="{% url 'panel_product_add' %}" class="btn btn-primary" style="margin-top:12px">Add your first product</a>
+  </div>
+ 
+{% else %}
+ 
+<!-- product table -->
+<div class="card">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Company</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Discount</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+ 
+          <!-- product image -->
+          <td>
+            {% if product.image %}
+              <img src="{{ product.image.url }}"
+                   style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
+            {% else %}
+              <div style="width:50px; height:50px; background:#f0f0f0;
+                          border-radius:6px; display:flex; align-items:center;
+                          justify-content:center; color:#999; font-size:20px;">
+                📦
+              </div>
+            {% endif %}
+          </td>
+ 
+          <!-- clicking name goes to product detail page -->
+          <td>
+            <a href="{% url 'panel_product_detail' product.id %}"
+               style="color: var(--accent); font-weight: 500;">
+              {{ product.name }}
+            </a>
+          </td>
+ 
+          <td>{{ product.category.name }}</td>
+          <td>{{ product.company }}</td>
+ 
+          <!-- show discounted price if discount is active -->
+          <td>
+            {% if product.discount_active %}
+              <span style="text-decoration:line-through; color:#999; font-size:0.85rem;">
+                Rs {{ product.price }}
+              </span><br>
+              <span style="color: #22c55e; font-weight:600;">
+                Rs {{ product.discounted_price }}
+              </span>
+            {% else %}
+              Rs {{ product.price }}
+            {% endif %}
+          </td>
+ 
+          <td>{{ product.stock_qty }}</td>
+ 
+          <!-- discount badge -->
+          <td>
+            {% if product.has_discount %}
+              <span class="badge badge-green">{{ product.discount_percent }}% off</span>
+            {% else %}
+              <span class="badge badge-amber">No discount</span>
+            {% endif %}
+          </td>
+ 
+          <!-- is_new badge -->
+          <td>
+            {% if product.is_new %}
+              <span class="badge badge-blue">New</span>
+            {% else %}
+              <span style="color:#999;">—</span>
+            {% endif %}
+          </td>
+ 
+          <!-- edit and delete buttons -->
+          <td style="display:flex; gap:8px; align-items:center;">
+<a href="{% url 'panel_product_detail' product.id %}" class="btn btn-outline btn-sm">Edit</a> 
+            <form method="post" action="{% url 'panel_product_delete' product.id %}"
+                  onsubmit="return confirm('Delete {{ product.name }}?')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </td>
+ 
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+ 
+{% endif %}
+ 
+{% endblock %}

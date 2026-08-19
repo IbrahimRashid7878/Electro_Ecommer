@@ -1,0 +1,84 @@
+{% extends 'panel/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Welcome back, {{ request.user.get_full_name|default:request.user.username }} 👋</h2>
+</div>
+
+<!-- Stats row -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <p class="stat-label">Total orders</p>
+    <p class="stat-value">{{ stats.total_orders|default:'0' }}</p>
+    <p class="stat-sub">Lifetime</p>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">Pending</p>
+    <p class="stat-value">{{ stats.pending|default:'0' }}</p>
+    <p class="stat-sub">Awaiting dispatch</p>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">Delivered</p>
+    <p class="stat-value">{{ stats.delivered|default:'0' }}</p>
+    <p class="stat-sub">Completed</p>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">Total spent</p>
+    <p class="stat-value">Rs {{ stats.total_spent|default:'0' }}</p>
+    <p class="stat-sub">All time</p>
+  </div>
+</div>
+
+<!-- Recent orders -->
+<div class="card">
+  <div class="page-header" style="margin-bottom:14px">
+    <p class="card-title" style="margin:0">Recent orders</p>
+    <a href="{% url 'panel:my_orders' %}" class="btn btn-outline btn-sm">View all</a>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Order #</th>
+          <th>Date</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in recent_orders %}
+        <tr>
+          <td><a href="{% url 'panel:order_detail' order.pk %}" style="color:var(--accent)">#{{ order.pk }}</a></td>
+          <td>{{ order.created_at|date:"d M Y" }}</td>
+          <td>{{ order.items.count }}</td>
+          <td>Rs {{ order.total }}</td>
+          <td>
+            {% if order.status == 'delivered' %}
+              <span class="badge badge-green">Delivered</span>
+            {% elif order.status == 'pending' %}
+              <span class="badge badge-amber">Pending</span>
+            {% elif order.status == 'cancelled' %}
+              <span class="badge badge-red">Cancelled</span>
+            {% else %}
+              <span class="badge badge-blue">{{ order.get_status_display }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" style="text-align:center;color:var(--text-secondary);padding:28px">
+            No orders yet. <a href="{% url 'panel:product_list' %}" style="color:var(--accent)">Start shopping →</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

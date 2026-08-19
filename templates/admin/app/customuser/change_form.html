@@ -1,0 +1,53 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+(function() {
+    // Handle anchor navigation for fieldsets
+    function handleAnchorNavigation() {
+        const hash = window.location.hash;
+        
+        // Map of anchor names to fieldset indices/identifiers
+        const fieldsetMap = {
+            'vendor-status-tab': 2  // "Vendor Status" is the 3rd fieldset (0-indexed = 2)
+        };
+        
+        if (hash) {
+            const anchorName = hash.substring(1);  // Remove the # 
+            const fieldsetIndex = fieldsetMap[anchorName];
+            
+            if (fieldsetIndex !== undefined) {
+                // Find the fieldset by index
+                const fieldsets = document.querySelectorAll('fieldset');
+                if (fieldsets[fieldsetIndex]) {
+                    const fieldset = fieldsets[fieldsetIndex];
+                    const collapseToggle = fieldset.querySelector('h2');
+                    
+                    // Check if fieldset is collapsed
+                    if (fieldset.classList.contains('collapsed')) {
+                        // Expand the fieldset by clicking the toggle
+                        if (collapseToggle) {
+                            collapseToggle.click();
+                        }
+                    }
+                    
+                    // Scroll to the fieldset
+                    fieldset.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        }
+    }
+    
+    // Run when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', handleAnchorNavigation);
+    } else {
+        handleAnchorNavigation();
+    }
+    
+    // Also handle hash change
+    window.addEventListener('hashchange', handleAnchorNavigation);
+})();
+</script>
+{% endblock %}

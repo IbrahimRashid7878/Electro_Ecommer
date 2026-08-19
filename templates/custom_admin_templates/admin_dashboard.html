@@ -1,0 +1,134 @@
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+ 
+{% block title %}Control Panel{% endblock %}
+{% block page_title %}Control panel{% endblock %}
+ 
+{% block content %}
+ 
+<div class="page-header">
+  <h2>Admin overview</h2>
+</div>
+ 
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <p class="stat-label">Total users</p>
+    <p class="stat-value">{{ stats.total_users|default:'0' }}</p>
+    <p class="stat-sub">Registered</p>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">Vendors</p>
+    <p class="stat-value">{{ stats.vendor_count|default:'0' }}</p>
+    <p class="stat-sub">{{ stats.pending_vendors|default:'0' }} pending</p>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">Products</p>
+    <p class="stat-value">{{ stats.product_count|default:'0' }}</p>
+    <p class="stat-sub">Total listed</p>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">Orders today</p>
+    <p class="stat-value">{{ stats.orders_today|default:'0' }}</p>
+    <p class="stat-sub">Rs {{ stats.revenue_today|default:'0' }} revenue</p>
+  </div>
+</div>
+ 
+<!-- Quick navigation buttons -->
+<div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
+  <a href="{% url 'manage_vendors' %}" class="btn btn-primary">🏪 Manage Vendors</a>
+  <a href="{% url 'manage_users' %}"   class="btn btn-primary">👥 Manage Users</a>
+  <a href="{% url 'all_orders' %}"     class="btn btn-primary">📋 All Orders</a>
+  <a href="{% url 'manage_categories' %}" class="btn btn-outline">🗃 Categories</a>
+  <a href="{% url 'my_products' %}"    class="btn btn-outline">📦 Products</a>
+</div>
+ 
+<!-- Pending vendor approvals -->
+{% if pending_vendors %}
+<div class="card" style="margin-bottom:20px; border-left:4px solid #ef4444;">
+  <div class="page-header" style="margin-bottom:14px;">
+    <p class="card-title" style="margin:0;">⚠ Pending vendor approvals ({{ pending_vendors|length }})</p>
+    <a href="{% url 'manage_vendors' %}" class="btn btn-outline btn-sm">See all vendors</a>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Registered</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vendor in pending_vendors %}
+        <tr>
+          <td style="font-weight:500">{{ vendor.username }}</td>
+          <td>{{ vendor.email }}</td>
+          <td>{{ vendor.date_joined|date:"d M Y" }}</td>
+          <td style="display:flex; gap:8px;">
+            <form method="post" action="{% url 'approve_vendor' vendor.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary btn-sm">Approve</button>
+            </form>
+            <form method="post" action="{% url 'ban_user' vendor.pk %}"
+                  onsubmit="return confirm('Ban this vendor?')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Ban</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+ 
+<!-- Recent orders -->
+<div class="card">
+  <div class="page-header" style="margin-bottom:14px;">
+    <p class="card-title" style="margin:0;">Recent orders</p>
+    <a href="{% url 'all_orders' %}" class="btn btn-outline btn-sm">View all</a>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Order #</th>
+          <th>Customer</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in recent_orders %}
+        <tr>
+          <td style="font-weight:500">#{{ order.pk }}</td>
+          <td>{{ order.user.username }}</td>
+          <td>Rs {{ order.total_amount }}</td>
+          <td>
+            {% if order.status == 'Done' %}
+              <span class="badge badge-green">Done</span>
+            {% elif order.status == 'pending' %}
+              <span class="badge badge-amber">Pending</span>
+            {% else %}
+              <span class="badge badge-red">Cancelled</span>
+            {% endif %}
+          </td>
+          <td>{{ order.created_at|date:"d M Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" style="text-align:center; color:var(--text-secondary); padding:28px;">
+            No orders yet.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+ 
+{% endblock %}

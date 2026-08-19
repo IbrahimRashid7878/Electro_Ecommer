@@ -1,0 +1,118 @@
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+
+{% block title %}All Orders{% endblock %}
+{% block page_title %}All Orders{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>All Orders</h2>
+  <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">← Back to dashboard</a>
+</div>
+
+<!-- filter buttons -->
+<div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+  <a href="{% url 'all_orders' %}"
+     style="padding:8px 18px; border-radius:20px; font-size:0.85rem; font-weight:600;
+            text-decoration:none;
+            background:{% if not status_filter %}var(--accent){% else %}#f0f0f0{% endif %};
+            color:{% if not status_filter %}white{% else %}#666{% endif %};">
+    All ({{ total_count }})
+  </a>
+  <a href="{% url 'all_orders' %}?status=pending"
+     style="padding:8px 18px; border-radius:20px; font-size:0.85rem; font-weight:600;
+            text-decoration:none;
+            background:{% if status_filter == 'pending' %}#f59e0b{% else %}#fef3c7{% endif %};
+            color:{% if status_filter == 'pending' %}white{% else %}#92400e{% endif %};">
+    Pending ({{ pending_count }})
+  </a>
+  <a href="{% url 'all_orders' %}?status=Done"
+     style="padding:8px 18px; border-radius:20px; font-size:0.85rem; font-weight:600;
+            text-decoration:none;
+            background:{% if status_filter == 'Done' %}#22c55e{% else %}#dcfce7{% endif %};
+            color:{% if status_filter == 'Done' %}white{% else %}#166534{% endif %};">
+    Done ({{ done_count }})
+  </a>
+  <a href="{% url 'all_orders' %}?status=Cancelled"
+     style="padding:8px 18px; border-radius:20px; font-size:0.85rem; font-weight:600;
+            text-decoration:none;
+            background:{% if status_filter == 'Cancelled' %}#ef4444{% else %}#fee2e2{% endif %};
+            color:{% if status_filter == 'Cancelled' %}white{% else %}#991b1b{% endif %};">
+    Cancelled ({{ cancelled_count }})
+  </a>
+</div>
+
+<!-- orders table -->
+<div class="card">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Order #</th>
+          <th>Customer</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>City</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td style="font-weight:600;">#{{ order.pk }}</td>
+          <td>{{ order.first_name }} {{ order.last_name }}</td>
+          <td>{{ order.email }}</td>
+          <td>{{ order.phone }}</td>
+          <td>{{ order.city }}</td>
+          <td style="font-weight:600;">Rs {{ order.total_amount }}</td>
+          <td>
+            {% if order.status == 'Done' %}
+              <span class="badge badge-green">Done</span>
+            {% elif order.status == 'pending' %}
+              <span class="badge badge-amber">Pending</span>
+            {% else %}
+              <span class="badge badge-red">Cancelled</span>
+            {% endif %}
+          </td>
+          <td>{{ order.created_at|date:"d M Y" }}</td>
+          <td style="display:flex; gap:8px;">
+
+            <a href="{% url 'all_order_detail' order.pk %}" class="btn btn-outline btn-sm">View</a>
+            {% if order.status == 'pending' %}
+<form method="post" action="{% url 'update_order_status' order.pk %}">
+  {% csrf_token %}
+  <div style="display:flex; gap:6px;">
+    <button type="submit" name="status" value="Done"
+            style="background:#dcfce7; color:#166534; border:1px solid #22c55e;
+                   padding:5px 12px; border-radius:8px; cursor:pointer; font-size:0.8rem;">
+      ✓ Mark Done
+    </button>
+    <button type="submit" name="status" value="Cancelled"
+            style="background:#fee2e2; color:#991b1b; border:1px solid #ef4444;
+                   padding:5px 12px; border-radius:8px; cursor:pointer; font-size:0.8rem;">
+      ✕ Cancel
+    </button>
+  </div>
+</form>
+{% else %}
+  <span style="color:var(--text-secondary); font-size:0.8rem;"></span>
+{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9" style="text-align:center; padding:28px; color:var(--text-secondary);">
+            {% if status_filter %}No {{ status_filter }} orders.{% else %}No orders yet.{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

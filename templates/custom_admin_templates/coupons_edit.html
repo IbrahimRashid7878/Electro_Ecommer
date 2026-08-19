@@ -1,0 +1,88 @@
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+
+{% block title %}Edit Coupon{% endblock %}
+{% block page_title %}Edit Coupon{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>Edit Coupon: {{ coupon.code }}</h2>
+  <a href="{% url 'manage_coupons' %}" class="btn btn-outline">← Back to coupons</a>
+</div>
+
+<!-- coupon status card -->
+<div class="card" style="max-width:550px; margin-bottom:16px;
+     border-left:4px solid {% if coupon.is_valid %}#22c55e{% else %}#f59e0b{% endif %};">
+  <p style="margin:0; font-size:0.9rem;">
+    {% if coupon.is_valid %}
+      ✓ This coupon is currently <strong>valid and active</strong>.
+    {% elif not coupon.active %}
+      ✗ This coupon is <strong>inactive</strong>.
+    {% else %}
+      ✗ This coupon is <strong>outside its valid date range</strong>.
+    {% endif %}
+  </p>
+</div>
+
+<div class="card" style="max-width:550px;">
+
+  <!-- edit form -->
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Coupon Code -->
+    <div class="form-group">
+      <label>Coupon Code *</label>
+      <input type="text" name="code" class="form-control"
+             value="{{ coupon.code }}" required
+             style="text-transform:uppercase; letter-spacing:2px;">
+    </div>
+
+    <!-- Discount Percent -->
+    <div class="form-group">
+      <label>Discount Percent (%) *</label>
+      <input type="number" name="discount_percent" class="form-control"
+             value="{{ coupon.discount_percent }}" min="1" max="100" required>
+    </div>
+
+    <!-- Valid From — pre-fill with existing value -->
+    <div class="form-group">
+      <label>Valid From *</label>
+      <input type="datetime-local" name="valid_from" class="form-control"
+             value="{{ coupon.valid_from|date:'Y-m-d\TH:i' }}" required>
+    </div>
+
+    <!-- Valid To -->
+    <div class="form-group">
+      <label>Valid To *</label>
+      <input type="datetime-local" name="valid_to" class="form-control"
+             value="{{ coupon.valid_to|date:'Y-m-d\TH:i' }}" required>
+    </div>
+
+    <!-- Active checkbox -->
+    <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+      <input type="checkbox" name="active" id="active"
+             style="width:18px; height:18px;"
+             {% if coupon.active %}checked{% endif %}>
+      <label for="active" style="margin:0;">Active</label>
+    </div>
+
+    <div style="display:flex; gap:12px; margin-top:8px;">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a href="{% url 'manage_coupons' %}" class="btn btn-outline">Cancel</a>
+    </div>
+
+  </form>
+
+  <!-- delete form — outside the edit form -->
+  <form method="post" action="{% url 'coupon_delete' coupon.id %}"
+        style="margin-top:20px; border-top:1px solid #e5e7eb; padding-top:16px;"
+        onsubmit="return confirm('Delete coupon {{ coupon.code }}?')">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete This Coupon</button>
+  </form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+ 
+{% block title %}Vendor Dashboard{% endblock %}
+{% block page_title %}Vendor Dashboard{% endblock %}
+ 
+{% block content %}
+ 
+<div class="page-header">
+  <h2>Welcome, {{ request.user.username }}</h2>
+</div>
+ 
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <p class="stat-label">Total Products</p>
+    <p class="stat-value">{{ product_count }}</p>
+    <p class="stat-sub">Listed in store</p>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">Total Orders</p>
+    <p class="stat-value">{{ order_count }}</p>
+    <p class="stat-sub">All time</p>
+  </div>
+  <div class="stat-card">
+    <p class="stat-label">Revenue</p>
+    <p class="stat-value">Rs {{ total_revenue|floatformat:2 }}</p>
+    <p class="stat-sub">Completed orders</p>
+  </div>
+</div>
+ 
+<!-- Quick links -->
+<div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
+  <a href="{% url 'panel_product_add' %}" class="btn btn-primary">+ Add Product</a>
+  <a href="{% url 'my_products' %}" class="btn btn-outline">View All Products</a>
+  <a href="{% url 'manage_categories' %}" class="btn btn-outline">Manage Categories</a>
+  <a href="{% url 'vendor_orders' %}" class="btn btn-outline">View Orders</a>
+  <a href="{% url 'vendor_customers' %}" class="btn btn-outline">View Customers</a>
+  <a href="{% url 'view_carts' %}" class="btn btn-outline">View Carts</a>
+</div>
+ 
+<!-- Recent products -->
+<div class="card">
+  <div class="page-header" style="margin-bottom:14px">
+    <p class="card-title" style="margin:0">Recent Products</p>
+    <a href="{% url 'my_products' %}" class="btn btn-outline btn-sm">View all</a>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products|slice:":5" %}
+        <tr>
+          <td>
+            {% if product.image %}
+              <img src="{{ product.image.url }}"
+                   style="width:45px; height:45px; object-fit:cover; border-radius:6px;">
+            {% else %}
+              <div style="width:45px; height:45px; background:#f0f0f0;
+                          border-radius:6px; display:flex; align-items:center;
+                          justify-content:center;">📦</div>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'panel_product_detail' product.id %}"
+               style="color:var(--accent); font-weight:500;">
+              {{ product.name }}
+            </a>
+          </td>
+          <td>{{ product.category.name }}</td>
+          <td>Rs {{ product.price }}</td>
+          <td>{{ product.stock_qty }}</td>
+          <td style="display:flex; gap:8px;">
+            <a href="{% url 'panel_product_detail' product.id %}" class="btn btn-outline btn-sm">Edit</a>
+            <form method="post" action="{% url 'panel_product_delete' product.id %}"
+                  onsubmit="return confirm('Delete {{ product.name }}?')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" style="text-align:center; padding:28px; color:var(--text-secondary);">
+            No products yet. <a href="{% url 'panel_product_add' %}">Add one</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+ 
+<!-- Recent orders -->
+<div class="card" style="margin-top:24px;">
+  <div class="page-header" style="margin-bottom:14px">
+    <p class="card-title" style="margin:0">Recent Orders</p>
+    <a href="{% url 'vendor_orders' %}" class="btn btn-outline btn-sm">View all</a>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Order #</th>
+          <th>Customer</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders|slice:":5" %}
+        <tr>
+          <td style="font-weight:500">
+            <a href="{% url 'order_detail' order.id %}" style="color:var(--accent);">
+              #{{ order.order.id }}
+            </a>
+          </td>
+          <td>{{ order.order.user.username }}</td>
+          <td>
+            <div style="font-size:0.9rem; color:var(--text-secondary);">
+              <div style="font-weight:600;">Your Total: Rs {{ order.subtotal|floatformat:2 }}</div>
+              <div style="font-size:0.85rem;">Order Total: Rs {{ order.order.total_amount|floatformat:2 }}</div>
+            </div>
+          </td>
+          <td>
+            {% if order.status == 'Done' %}
+              <span class="badge badge-green">Done</span>
+            {% elif order.status == 'pending' %}
+              <span class="badge badge-amber">Pending</span>
+            {% else %}
+              <span class="badge badge-red">Cancelled</span>
+            {% endif %}
+          </td>
+          <td>{{ order.order.created_at|date:"d M Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" style="text-align:center; padding:28px; color:var(--text-secondary);">
+            No orders yet.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+ 
+{% endblock %}

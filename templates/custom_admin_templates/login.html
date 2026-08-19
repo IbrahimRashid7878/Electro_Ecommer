@@ -1,0 +1,85 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign in — ElectroShop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'custom_admin_templates/css/panel.css' %}"/>
+  <style>
+    body { display:flex; align-items:center; justify-content:center; min-height:100vh; background:#f6f7fb; }
+    .auth-card {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      border: 1px solid #e4e7ef;
+      border-radius: 14px;
+      padding: 36px 32px;
+    }
+    .auth-logo {
+      display:flex; align-items:center; gap:8px;
+      margin-bottom: 28px;
+    }
+    .auth-logo-icon { font-size:26px; }
+    .auth-logo-text {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:20px; font-weight:700; color:#111827;
+    }
+    h2 { font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; margin-bottom:6px; }
+    .auth-sub { font-size:13px; color:#6b7280; margin-bottom:24px; }
+    .auth-links { text-align:center; margin-top:16px; font-size:13px; color:#6b7280; }
+    .auth-links a { color:var(--accent-customer); font-weight:500; }
+  </style>
+</head>
+<body>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="auth-logo-icon">⚡</span>
+      <span class="auth-logo-text">ElectroShop</span>
+    </div>
+    <h2>Sign in to your account</h2>
+    <p class="auth-sub">Welcome back. Enter your details below.</p>
+
+    {% if form.non_field_errors %}
+    <div class="flash flash--error" style="margin-bottom:16px">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+{% if form.non_field_errors %}
+<div class="flash flash--error" style="margin-bottom:16px">{{ form.non_field_errors }}</div>
+{% endif %}
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="flash flash--error" style="margin-bottom:16px">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+    <form method="post" action="{% url 'panel_login' %}">
+      {% csrf_token %}
+      <div class="form-group">
+  <label class="form-label" for="id_email">Email</label>
+  <input class="form-control" type="email" id="id_email" name="email"
+         placeholder="your_email@example.com" autocomplete="username" required/>
+</div>
+      <div class="form-group">
+        <label class="form-label" for="id_password">Password</label>
+        <input class="form-control" type="password" id="id_password" name="password"
+               placeholder="••••••••" autocomplete="current-password" required/>
+      </div>
+      <input type="hidden" name="next" value="{{ next }}"/>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px">
+        Sign in →
+      </button>
+    </form>
+
+    <div class="auth-links">
+      Don't have an account?
+      <a href="{% url 'register' %}">Register here</a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+
+{% block title %}Customers{% endblock %}
+{% block page_title %}Customers{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>Customers</h2>
+  {% if request.user.role == 'admin' %}
+    <p style="color:var(--text-secondary); font-size:0.9rem; margin:4px 0 0 0;">All customers</p>
+  {% else %}
+    <p style="color:var(--text-secondary); font-size:0.9rem; margin:4px 0 0 0;">Customers who ordered from your store</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Name</th>
+          <th>Total Orders</th>
+          <th>Last Order</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for customer in customers %}
+        <tr>
+          <td style="font-weight:500">#{{ customer.id }}</td>
+          <td>{{ customer.username }}</td>
+          <td>{{ customer.email }}</td>
+          <td>{{ customer.first_name }} {{ customer.last_name }}</td>
+          <td>
+            <span style="background:#f0f0f0; padding:4px 8px; border-radius:4px; font-weight:600;">
+              {{ customer.order_set.count }}
+            </span>
+          </td>
+          <td>
+            {% with last_order=customer.order_set.all|first %}
+              {% if last_order %}
+                {{ last_order.created_at|date:"d M Y" }}
+              {% else %}
+                —
+              {% endif %}
+            {% endwith %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" style="text-align:center; padding:28px; color:var(--text-secondary);">
+            {% if request.user.role == 'vendor' %}
+              No customers yet. Start selling products!
+            {% else %}
+              No customers found.
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div style="display:flex; justify-content:center; gap:8px; margin-top:20px; flex-wrap:wrap;">
+  {% if page_obj.has_previous %}
+    <a href="?page=1" class="btn btn-outline btn-sm">First</a>
+    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline btn-sm">Previous</a>
+  {% endif %}
+
+  <span style="padding:6px 12px; background:#f0f0f0; border-radius:4px;">
+    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+  </span>
+
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline btn-sm">Next</a>
+    <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-outline btn-sm">Last</a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

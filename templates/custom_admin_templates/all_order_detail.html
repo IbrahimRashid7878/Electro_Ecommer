@@ -1,0 +1,136 @@
+{% extends 'custom_admin_templates/base.html' %}
+
+{% block title %}
+Order #{{ order.id }}
+{% endblock %}
+
+{% block page_title %}
+Order Details
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h2>Order #{{ order.id }}</h2>
+</div>
+
+
+<!-- Customer Information -->
+
+<div class="card" style="margin-bottom:20px; padding:20px;">
+
+    <h3>Customer Information</h3>
+
+    <p>
+        <strong>Name:</strong>
+        {{ order.first_name }} {{ order.last_name }}
+    </p>
+
+    <p>
+        <strong>Email:</strong>
+        {{ order.email }}
+    </p>
+
+    <p>
+        <strong>Phone:</strong>
+        {{ order.phone }}
+    </p>
+
+    <p>
+        <strong>Address:</strong>
+        {{ order.address }}
+    </p>
+
+    <p>
+        <strong>City:</strong>
+        {{ order.city }}
+    </p>
+
+    <p>
+        <strong>Total Order Amount:</strong>
+        Rs {{ order.total_amount }}
+    </p>
+
+</div>
+
+
+<!-- Vendor Orders -->
+
+{% for vendor_order in order.vendor_orders.all %}
+
+<div class="card" style="margin-bottom:20px; padding:20px;">
+
+    <h3>
+        Vendor:
+        {{ vendor_order.vendor.username }}
+    </h3>
+
+    <p>
+        <strong>Vendor Order ID:</strong>
+        #{{ vendor_order.id }}
+    </p>
+
+    <p>
+        <strong>Subtotal:</strong>
+        Rs {{ vendor_order.subtotal }}
+    </p>
+
+    <p>
+        <strong>Status:</strong>
+        {{ vendor_order.status }}
+    </p>
+
+
+    <table class="data-table">
+
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for item in vendor_order.items.all %}
+
+            <tr>
+
+                <td>
+                    {{ item.product.name }}
+                </td>
+
+                <td>
+                    {{ item.quantity }}
+                </td>
+
+                <td>
+                    Rs {{ item.price }}
+                </td>
+
+                <td>
+                    Rs {% widthratio item.price 1 item.quantity %}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% empty %}
+
+<div class="card" style="padding:20px;">
+    No vendor orders found for this order.
+</div>
+
+{% endfor %}
+
+
+{% endblock %}

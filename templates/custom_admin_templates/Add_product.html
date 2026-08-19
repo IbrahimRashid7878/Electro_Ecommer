@@ -1,0 +1,117 @@
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+ 
+{% block title %}Add Product{% endblock %}
+{% block page_title %}Add Product{% endblock %}
+ 
+{% block content %}
+ 
+<div class="page-header">
+  <h2>Add New Product</h2>
+  <a href="{% url 'my_products' %}" class="btn btn-outline">← Back to products</a>
+</div>
+ 
+<div class="card" style="max-width: 700px;">
+ 
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+ 
+    <!-- Product Name -->
+    <div class="form-group">
+      <label>Product Name *</label>
+      <input type="text" name="name" class="form-control"
+             placeholder="e.g. Samsung Galaxy S24" required>
+    </div>
+ 
+    <!-- Category -->
+    <div class="form-group">
+      <label>Category *</label>
+      <select name="category" class="form-control" required>
+        <option value="">-- Select category --</option>
+        {% for cat in categories %}
+          <option value="{{ cat.id }}">{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+ 
+    <!-- Company -->
+    <div class="form-group">
+      <label>Company / Brand</label>
+      <input type="text" name="company" class="form-control"
+             placeholder="e.g. Samsung" value="Generic">
+    </div>
+ 
+    <!-- Price -->
+    <div class="form-group">
+      <label>Price (Rs) *</label>
+      <input type="number" name="price" class="form-control"
+             placeholder="e.g. 1500" step="0.01" min="0" required>
+    </div>
+ 
+    <!-- Stock -->
+    <div class="form-group">
+      <label>Stock Quantity *</label>
+      <input type="number" name="stock_qty" class="form-control"
+             placeholder="e.g. 50" min="0" value="0" required>
+    </div>
+ 
+    <!-- Description -->
+    <div class="form-group">
+      <label>Description</label>
+      <textarea name="description" class="form-control" rows="4"
+                placeholder="Write product description here...">No description available.</textarea>
+    </div>
+ 
+    <!-- Image -->
+    <div class="form-group">
+      <label>Product Image</label>
+      <input type="file" name="image" class="form-control" accept="image/*">
+    </div>
+ 
+    <!-- is_new checkbox -->
+    <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+      <input type="checkbox" name="is_new" id="is_new" style="width:18px; height:18px;">
+      <label for="is_new" style="margin:0;">Mark as New Arrival</label>
+    </div>
+ 
+    <!-- Discount section -->
+    <div class="form-group">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <input type="checkbox" name="has_discount" id="has_discount"
+               style="width:18px; height:18px;"
+               onchange="document.getElementById('discount_fields').style.display = this.checked ? 'block' : 'none'">
+        <label for="has_discount" style="margin:0;">Enable Discount</label>
+      </div>
+ 
+      <!-- discount fields — hidden by default, shown when checkbox ticked -->
+      <div id="discount_fields" style="display:none; background:#f9f9f9;
+           padding:16px; border-radius:8px; border:1px solid #e5e7eb;">
+ 
+        <div class="form-group">
+          <label>Discount Percent (%)</label>
+          <input type="number" name="discount_percent" class="form-control"
+                 placeholder="e.g. 20" min="1" max="100">
+        </div>
+ 
+        <div class="form-group">
+          <label>Discount Start Date & Time</label>
+          <input type="datetime-local" name="discount_start_date" class="form-control">
+        </div>
+ 
+        <div class="form-group">
+          <label>Discount End Date & Time</label>
+          <input type="datetime-local" name="discount_end_date" class="form-control">
+        </div>
+ 
+      </div>
+    </div>
+ 
+    <div style="display:flex; gap:12px; margin-top:8px;">
+      <button type="submit" class="btn btn-primary">Save Product</button>
+      <a href="{% url 'my_products' %}" class="btn btn-outline">Cancel</a>
+    </div>
+ 
+  </form>
+</div>
+ 
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+
+{% block title %}Categories{% endblock %}
+{% block page_title %}Manage Categories{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>All Categories</h2>
+  <a href="{% url 'category_add' %}" class="btn btn-primary">+ Add Category</a>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Category Name</th>
+          <th>Domain</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for category in categories %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+
+          <!-- clicking name goes to edit page -->
+          <td>
+            <a href="{% url 'category_edit' category.id %}"
+               style="color:var(--accent); font-weight:500;">
+              {{ category.name }}
+            </a>
+          </td>
+
+          <td>{{ category.domain.store_name|default:"—" }}</td>
+
+          <td style="display:flex; gap:8px;">
+            <a href="{% url 'category_edit' category.id %}"
+               class="btn btn-outline btn-sm">Edit</a>
+            <form method="post" action="{% url 'category_delete' category.id %}"
+                  onsubmit="return confirm('Delete {{ category.name }}? Products using this category will be affected.')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" style="text-align:center; padding:28px; color:var(--text-secondary);">
+            No categories yet. <a href="{% url 'category_add' %}">Add one</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

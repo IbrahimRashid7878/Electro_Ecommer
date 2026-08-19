@@ -1,0 +1,32 @@
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+
+{% block title %}Add Category{% endblock %}
+{% block page_title %}Add Category{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>Add New Category</h2>
+  <a href="{% url 'manage_categories' %}" class="btn btn-outline">← Back to categories</a>
+</div>
+
+<div class="card" style="max-width:500px;">
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label>Category Name *</label>
+      <input type="text" name="name" class="form-control"
+             placeholder="e.g. Electronics" required autofocus>
+    </div>
+
+    <div style="display:flex; gap:12px; margin-top:8px;">
+      <button type="submit" class="btn btn-primary">Save Category</button>
+      <a href="{% url 'manage_categories' %}" class="btn btn-outline">Cancel</a>
+    </div>
+
+  </form>
+</div>
+
+{% endblock %}

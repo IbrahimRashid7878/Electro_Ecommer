@@ -1,0 +1,193 @@
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+ 
+{% block title %}{{ product.name }}{% endblock %}
+{% block page_title %}Product Detail{% endblock %}
+ 
+{% block content %}
+ 
+<div class="page-header">
+  <h2>{{ product.name }}</h2>
+  <a href="{% url 'my_products' %}" class="btn btn-outline">← Back to products</a>
+</div>
+ 
+<!-- 2 column layout: image on left, details on right -->
+<div style="display:grid; grid-template-columns: 280px 1fr; gap:24px; align-items:start;">
+ 
+  <!-- LEFT: product image -->
+  <div class="card" style="text-align:center; padding:20px;">
+    {% if product.image %}
+      <img src="{{ product.image.url }}"
+           style="width:100%; max-height:260px; object-fit:contain; border-radius:8px;">
+    {% else %}
+      <div style="width:100%; height:200px; background:#f0f0f0; border-radius:8px;
+                  display:flex; align-items:center; justify-content:center;
+                  font-size:60px;">
+        📦
+      </div>
+    {% endif %}
+    <p style="margin-top:12px; color:var(--text-secondary); font-size:0.85rem;">
+      Current image
+    </p>
+ 
+    <!-- quick info below image -->
+    <div style="text-align:left; margin-top:16px; border-top:1px solid #e5e7eb; padding-top:16px;">
+      <p style="margin:6px 0;"><strong>Price:</strong> Rs {{ product.price }}</p>
+      <p style="margin:6px 0;"><strong>Stock:</strong> {{ product.stock_qty }} units</p>
+      <p style="margin:6px 0;"><strong>Category:</strong> {{ product.category.name }}</p>
+      <p style="margin:6px 0;"><strong>Company:</strong> {{ product.company }}</p>
+      <p style="margin:6px 0;">
+        <strong>Status:</strong>
+        {% if product.is_new %}
+          <span class="badge badge-blue">New</span>
+        {% else %}
+          <span style="color:#999;">Standard</span>
+        {% endif %}
+      </p>
+      <p style="margin:6px 0;">
+        <strong>Discount:</strong>
+        {% if product.discount_active %}
+          <span class="badge badge-green">Active — {{ product.discount_percent }}% off</span>
+        {% elif product.has_discount %}
+          <span class="badge badge-amber">Set but inactive</span>
+        {% else %}
+          <span style="color:#999;">None</span>
+        {% endif %}
+      </p>
+      {% if product.discount_active %}
+        <p style="margin:6px 0;">
+          <strong>Final price:</strong>
+          <span style="color:#22c55e; font-weight:600;">Rs {{ product.discounted_price }}</span>
+        </p>
+      {% endif %}
+    </div>
+  </div>
+ 
+  <!-- RIGHT: edit form -->
+  <div class="card">
+    <p class="card-title" style="margin-bottom:20px;">Edit Product Details.</p>
+    <p class="card-card-subtitle" style="margin-bottom:20px;">Vendor {{ product.vendor.username }}</p>
+ 
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+ 
+      <!-- Name -->
+      <div class="form-group">
+        <label>Product Name *</label>
+        <input type="text" name="name" class="form-control"
+               value="{{ product.name }}" required>
+      </div>
+ 
+      <!-- Category -->
+      <div class="form-group">
+        <label>Category *</label>
+        <select name="category" class="form-control" required>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}"
+              {% if cat.id == product.category.id %}selected{% endif %}>
+              {{ cat.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+ 
+      <!-- Company -->
+      <div class="form-group">
+        <label>Company / Brand</label>
+        <input type="text" name="company" class="form-control"
+               value="{{ product.company }}">
+      </div>
+ 
+      <!-- Price -->
+      <div class="form-group">
+        <label>Price (Rs) *</label>
+        <input type="number" name="price" class="form-control"
+               value="{{ product.price }}" step="0.01" min="0" required>
+      </div>
+ 
+      <!-- Stock -->
+      <div class="form-group">
+        <label>Stock Quantity *</label>
+        <input type="number" name="stock_qty" class="form-control"
+               value="{{ product.stock_qty }}" min="0" required>
+      </div>
+ 
+      <!-- Description -->
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" class="form-control"
+                  rows="4">{{ product.description }}</textarea>
+      </div>
+ 
+      <!-- Image -->
+      <div class="form-group">
+        <label>Replace Image (leave empty to keep current)</label>
+        <input type="file" name="image" class="form-control" accept="image/*">
+      </div>
+ 
+      <!-- is_new -->
+      <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+        <input type="checkbox" name="is_new" id="is_new"
+               style="width:18px; height:18px;"
+               {% if product.is_new %}checked{% endif %}>
+        <label for="is_new" style="margin:0;">Mark as New Arrival</label>
+      </div>
+ 
+      <!-- Discount -->
+      <div class="form-group">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <input type="checkbox" name="has_discount" id="has_discount"
+                 style="width:18px; height:18px;"
+                 {% if product.has_discount %}checked{% endif %}
+                 onchange="document.getElementById('discount_fields').style.display = this.checked ? 'block' : 'none'">
+          <label for="has_discount" style="margin:0;">Enable Discount</label>
+        </div>
+ 
+        <div id="discount_fields"
+             style="display: {% if product.has_discount %}block{% else %}none{% endif %};
+                    background:#f9f9f9; padding:16px; border-radius:8px;
+                    border:1px solid #e5e7eb;">
+ 
+          <div class="form-group">
+            <label>Discount Percent (%)</label>
+            <input type="number" name="discount_percent" class="form-control"
+                   value="{{ product.discount_percent|default:'' }}"
+                   min="1" max="100">
+          </div>
+ 
+          <div class="form-group">
+            <label>Discount Start Date & Time</label>
+            <input type="datetime-local" name="discount_start_date" class="form-control"
+                   value="{{ product.discount_start_date|date:'Y-m-d\TH:i'|default:'' }}">
+          </div>
+ 
+          <div class="form-group">
+            <label>Discount End Date & Time</label>
+            <input type="datetime-local" name="discount_end_date" class="form-control"
+                   value="{{ product.discount_end_date|date:'Y-m-d\TH:i'|default:'' }}">
+          </div>
+ 
+        </div>
+      </div>
+ 
+      <div style="display:flex; gap:12px; margin-top:8px;">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'my_products' %}" class="btn btn-outline">Cancel</a>
+      </div>
+
+    </form>  <!-- edit form closes here -->
+
+    <!-- delete form is now separate, outside the edit form -->
+    <form method="post" action="{% url 'panel_product_delete' product.id %}"
+          style="margin-top:12px;"
+          onsubmit="return confirm('Are you sure you want to delete {{ product.name }}?')">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete Product</button>
+    </form>
+ 
+    </form>
+  </div>
+ 
+</div>
+ 
+{% endblock %}

@@ -1,0 +1,505 @@
+
+{% extends 'base.html' %}
+<title>{% block title %}SHOP{% endblock %}</title>
+{% load static %}
+
+{% block content %}
+
+		<!-- BREADCRUMB -->
+		<div id="breadcrumb" class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+
+					<div class="col-md-12">
+						
+						
+						<ul class="breadcrumb-tree">
+							
+							<li><a href="{% url 'index' %}">Home</a></li>
+							<li><a href="{% url 'categories' %}">All Categories</a></li>
+							{% if selected_category %}<li class="active">{{ selected_category.name }} ({{ products.paginator.count }} Results)</li>
+							{% else %}<li class="active">All Products ({{ products.paginator.count }} Results)</li>{% endif %}
+						</ul>
+						
+					</div>
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /BREADCRUMB -->
+
+		<!-- SECTION -->
+		<div class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+					<!-- ASIDE -->
+					<div id="aside" class="col-md-3">
+						<!-- aside Widget -->
+						<div class="aside">
+							<h3 class="aside-title">Categories</h3>
+							<div class="checkbox-filter">
+
+								<form method="get">
+
+								<!-- CATEGORY FILTER -->
+								{% for category in categories %}
+									<div class="input-checkbox">
+										<input
+											type="checkbox"
+											name="category"
+											value="{{ category.name }}"
+											id="category-{{ category.id }}"
+											{% if category.name in selected_categories %}checked{% endif %}
+										>
+										<label for="category-{{ category.id }}">
+											<span></span>
+											{{ category.name }}
+										</label>
+									</div>
+								{% endfor %}
+
+
+								
+
+
+
+								<!-- PRICE FILTER -->
+								<h3 style="margin-top: 15px;" class="aside-title">Price</h3>
+
+								<div class="price-filter">
+									<div id="price-slider"></div>
+
+									<div class="input-number price-min">
+										<input
+											id="price-min"
+											type="number"
+											name="min_price"
+											value="{{ request.GET.min_price|default:'0' }}"
+										>
+									</div>
+
+									<span>-</span>
+
+									<div class="input-number price-max">
+										<input
+											id="price-max"
+											type="number"
+											name="max_price"
+											value="{{ request.GET.max_price|default:'1000000' }}"
+										>
+									</div>
+
+								</div>
+
+
+								
+
+
+						</div>
+					</div>
+
+
+						<!-- /aside Widget -->
+
+						<!-- aside Widget -->
+						<div class="aside">
+							<h3 class="aside-title">Brand</h3>
+							<div class="checkbox-filter">
+								{% for c in companies %}
+								<div class="input-checkbox">
+									<input type="checkbox" id="com{{ forloop.counter }}" name="company" value="{{ c.company }}"
+									{% if c.company in selected_companies %}checked{% endif %}>
+									<label for="com{{ forloop.counter }}">
+										<span></span>
+										{{ c.company }}
+										<small>{{ c.count }}</small>
+									</label>
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+
+						<div style="margin-top: 15px;">
+									<button type="submit" class="primary-btn">Filter</button>
+								</div>
+
+					</form>
+						<!-- /aside Widget -->
+
+						<!-- aside Widget -->
+						<div class="aside">
+							<h3 class="aside-title">Top selling</h3>
+							<div class="product-widget">
+								<div class="product-img">
+									<img src="./img/product01.png" alt="">
+								</div>
+								<div class="product-body">
+									<p class="product-category">Category</p>
+									<h3 class="product-name"><a href="#">product name goes here</a></h3>
+									<h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
+								</div>
+							</div>
+
+							<div class="product-widget">
+								<div class="product-img">
+                        <img src="{% static 'img/product02.png' %}" alt="">
+								</div>
+								<div class="product-body">
+									<p class="product-category">Category</p>
+									<h3 class="product-name"><a href="#">product name goes here</a></h3>
+									<h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
+								</div>
+							</div>
+
+							<div class="product-widget">
+								<div class="product-img">
+									<img src="{% static 'img/product03.png' %}" alt="">
+								</div>
+								<div class="product-body">
+									<p class="product-category">Category</p>
+									<h3 class="product-name"><a href="#">product name goes here</a></h3>
+									<h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
+								</div>
+							</div>
+						</div>
+						<!-- /aside Widget -->
+					</div>
+					<!-- /ASIDE -->
+
+					<!-- STORE -->
+					<div id="store" class="col-md-9">
+						<!-- store top filter -->
+						<div class="store-filter clearfix">
+							<div class="store-sort">
+								<label>
+									Sort By:
+									<select class="input-select">
+										<option value="0">Popular</option>
+										<option value="1">Position</option>
+									</select>
+								</label>
+
+								<label>
+									Show:
+									<select class="input-select">
+										<option value="0">20</option>
+										<option value="1">50</option>
+									</select>
+								</label>
+							</div>
+							<ul class="store-grid">
+								<li class="active"><i class="fa fa-th"></i></li>
+								<li><a href="#"><i class="fa fa-th-list"></i></a></li>
+							</ul>
+						</div>
+						<!-- /store top filter -->
+
+						<!-- store products -->
+						
+						<div class="row">
+							<!-- product -->
+							{% for product in products %}
+							<div class="col-md-4 col-xs-6">
+								<div class="product">
+								<a href="{% url 'product' %}?id={{ product.id }}">
+
+									<div class="product-img">
+										<img src="{{ product.image.url }}" alt="{{ product.name }}">
+										
+										<div class="product-label">
+											<!-- {% if product.discount_active %}
+												<span class="sale">-{{ product.discount_percent }}%</span>
+											{% endif %} -->
+
+											{% if product.is_new %}
+												<span class="new">NEW</span>
+											{% endif %}
+										</div>
+									</div>
+
+									</a>
+
+									<div class="product-body">
+										<p class="product-category">{{ product.category.name }}</p>
+
+										<h3 class="product-name">
+											<a href="{% url 'product' %}?id={{ product.id }}">{{ product.name }}</a>
+										</h3>
+
+										{% if product.discount_active %}
+											<h4 class="product-price">
+												RS {{ product.discounted_price }}
+												<del class="product-old-price">RS {{ product.price }}</del>
+											</h4>
+										{% else %}
+											<h4 class="product-price">RS {{ product.price }}</h4>
+										{% endif %}
+
+										<div class="product-rating">
+											<i class="fa fa-star"></i>
+											<i class="fa fa-star"></i>
+											<i class="fa fa-star"></i>
+											<i class="fa fa-star"></i>
+											<i class="fa fa-star"></i>
+										</div>
+
+										<div class="product-btns">
+											<button 
+										class="btn btn-outline-danger btn-sm rounded-circle add-to-wishlist"
+										data-product-id="{{ product.id }}"
+										title="Add to wishlist"
+									>
+										<i class="fa fa-heart-o"></i>
+									</button>
+
+								
+
+											<button class="quick-view-btn btn-sm btn-outline-primary" data-product-id="{{ product.id }}">
+										<i class="fa fa-eye"></i>
+									</button>
+
+										</div>
+									</div>
+
+{% if product.stock_qty > 0 %}
+
+    {% if user.is_authenticated %}
+    <div class="add-to-cart">
+        <form method="POST" action="{% url 'add_to_cart' product.id %}">
+            {% csrf_token %}
+            <button type="submit" class="add-to-cart-btn">
+                <i class="fa fa-shopping-cart"></i> add to cart
+            </button>
+        </form>
+    </div>
+    {% else %}
+    <div class="add-to-cart">
+        <a href="{% url 'login' %}?next={{ request.path }}" class="add-to-cart-btn">
+            <i class="fa fa-shopping-cart"></i> login to add
+        </a>
+    </div>
+    {% endif %}
+
+{% else %}
+
+    <div class="add-to-cart">
+        <button class="add-to-cart-btn" style="background:#ccc; cursor:not-allowed;" disabled>
+            Stock Finished
+        </button>
+    </div>
+
+{% endif %}
+								</div>
+								
+							</div>
+							{% empty %}
+        <p>No products found in this category.</p>
+							{% endfor %}
+
+
+
+							<!-- /product -->
+
+						</div>
+						
+						<!-- /store products -->
+
+						<!-- store bottom filter -->
+						<div class="store-filter clearfix">
+							<span class="store-qty">
+								{% if products.start_index == products.end_index %}
+								Showing Product {{ products.start_index }} of {{ products.paginator.count }} products
+							{% else %}
+								Showing Product {{ products.start_index }}-{{ products.end_index }} of {{ products.paginator.count }} products
+							{% endif %}
+							</span>
+							<ul class="store-pagination">
+								{% if products.has_previous %}
+								<li><a href="{% url 'shop' %}?{{ querey_string }}&page={{ products.previous_page_number }}"><i class="fa fa-angle-left"></i></a></li>
+								{% endif %}
+
+								{% for num in products.paginator.page_range %}
+
+								{% if products.number < products.paginator.num_pages|add:'-2' %}
+									{% if num >= products.number|add:"-1" and num <= products.number|add:"2" %}
+										{% if num == products.number %}
+											<li class="active"><a href="{% url 'shop' %}?{{ querey_string }}&page={{ num }}">{{ num }}</a></li>
+										{% else %}
+											<li><a href="{% url 'shop' %}?{{ querey_string }}&page={{ num }}">{{ num }}</a></li>
+										{% endif %}
+										
+									{% endif %}
+								{% elif products.number >= products.paginator.num_pages|add:'-2' %}
+									{% if num >= products.paginator.num_pages|add:'-3' %}
+								
+										{% if num == products.number %}
+											<li class="active"><a href="{% url 'shop' %}?{{ querey_string }}&page={{ num }}">{{ num }}</a></li>
+										{% else %}
+											<li><a href="{% url 'shop' %}?{{ querey_string }}&page={{ num }}">{{ num }}</a></li>
+										{% endif %}
+										
+									{% endif %}
+								{% endif %}
+								
+								{% endfor %}
+
+
+
+<!-- 								
+								<li class="active"><a href="{% url 'shop' %}?page=1">1</a></li>
+								<li><a href="{% url 'shop' %}?page=2">2</a></li>
+								<li><a href="{% url 'shop' %}?page=3">3</a></li>
+								<li><a href="{% url 'shop' %}?page=4">4</a></li> -->
+								{% if products.has_next %}
+								<li><a href="{% url 'shop' %}?{{ querey_string }}&page={{ products.next_page_number }}"><i class="fa fa-angle-right"></i></a></li>
+								{% endif %}
+							</ul>
+						</div>
+
+						
+
+						<!-- /store bottom filter -->
+					</div>
+					<!-- /STORE -->
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+
+
+		<!-- Quickview Modal -->
+<div id="quickViewModal" style="display:none; position:fixed; z-index:1050; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.6);">
+  <div style="background:white; margin:5% auto; padding:20px; max-width:800px; border-radius:8px; position:relative;">
+    
+    <!-- Close Button -->
+    <span id="quickViewClose" style="position:absolute; top:10px; right:15px; font-size:24px; cursor:pointer;">&times;</span>
+    
+    <!-- Modal Content -->
+    <h5 id="quickViewTitle" class="fw-bold"></h5>
+    <div class="d-flex" style="gap:20px; flex-wrap:wrap;">
+        <img id="quickViewImage" src="" alt="" style="width:300px; object-fit:cover;">
+        <div>
+            <p id="quickViewCategory" class="text-muted mb-1"></p>
+            <p id="quickViewPrice" class="fw-bold mb-1"></p>
+            <p id="quickViewDescription" class="mb-2"></p>
+            <button class="btn btn-danger" id="quickViewWishlistBtn" data-product-id="">❤️ Add to Wishlist</button>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+		
+	<script>
+const priceSlider = document.getElementById('price-slider');
+const minInput = document.getElementById('price-min');
+const maxInput = document.getElementById('price-max');
+
+if (priceSlider) {
+    noUiSlider.create(priceSlider, {
+        start: [
+            parseInt(minInput.value || 0),
+            parseInt(maxInput.value || 500000)
+        ],
+        connect: true,
+        range: {
+            min: 0,
+            max: 500000
+        }
+    });
+
+    // Slider → Inputs
+    priceSlider.noUiSlider.on('update', function (values) {
+        minInput.value = Math.round(values[0]);
+        maxInput.value = Math.round(values[1]);
+    });
+
+    // Auto-submit when user stops sliding
+    priceSlider.noUiSlider.on('change', function () {
+        priceSlider.closest('form').submit();
+    });
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const modal = document.getElementById('quickViewModal');
+    const closeBtn = document.getElementById('quickViewClose');
+    const wishlistBtnModal = document.getElementById('quickViewWishlistBtn');
+
+    // ===== Wishlist on product cards =====
+    document.querySelectorAll(".add-to-wishlist").forEach(button => {
+        button.addEventListener("click", function() {
+            const productId = this.dataset.productId;
+            const icon = this.querySelector("i");
+
+            fetch(`/add_to_wishlist/${productId}/`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === "added") {
+                        button.classList.add("active");
+                        icon.className = "fa fa-heart";
+                    } else {
+                        button.classList.remove("active");
+                        icon.className = "fa fa-heart-o";
+                    }
+                })
+                .catch(err => console.error("Wishlist error:", err));
+        });
+    });
+
+    // ===== Quick View Modal =====
+    document.querySelectorAll(".quick-view-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const productId = this.dataset.productId;
+
+            fetch(`/shop/quick_view/?id=${productId}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('quickViewTitle').textContent = data.name;
+                    document.getElementById('quickViewImage').src = data.image;
+                    document.getElementById('quickViewCategory').textContent = data.category + " · " + data.company;
+                    document.getElementById('quickViewPrice').textContent = "Rs. " + data.price;
+                    document.getElementById('quickViewDescription').textContent = data.description;
+
+                    // Update wishlist button in modal
+                    wishlistBtnModal.dataset.productId = productId;
+
+                    modal.style.display = "block";
+                })
+                .catch(err => console.error("Quickview error:", err));
+        });
+    });
+
+    // ===== Close Modal =====
+    closeBtn.addEventListener("click", () => modal.style.display = "none");
+    window.addEventListener("click", e => { if(e.target === modal) modal.style.display = "none"; });
+
+    // ===== Wishlist inside modal =====
+    wishlistBtnModal.addEventListener("click", function() {
+        const productId = this.dataset.productId;
+
+        fetch(`/add_to_wishlist/${productId}/`)
+            .then(res => res.json())
+            .then(data => {
+                alert(data.status === "added" ? "Added to wishlist" : "Removed from wishlist");
+            });
+    });
+});
+</script>
+
+
+
+
+		
+		<!-- /SECTION -->
+
+{% endblock %}

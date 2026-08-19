@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Panel{% endblock %} — Custom Django Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'custom_admin_templates/css/panel.css' %}"/>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="role-{{ request.user.role|default:'guest' }}">
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <span class="logo-text">Custom Django Panel</span>
+    </div>
+    <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">✕</button>
+  </div>
+
+  <div class="role-badge-wrap">
+    <div class="role-badge role-badge--{{ request.user.role|default:'guest' }}">
+      {% if request.user.role == 'admin' %}Admin
+      {% elif request.user.role == 'vendor' %}Vendor
+      {% else %}Customer{% endif %}
+    </div>
+    <p class="sidebar-username">{{ request.user.get_full_name|default:request.user.username }}</p>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Panel navigation">
+
+    <!-- VENDOR sidebar — coupons only shown here, not admin -->
+    {% if request.user.role == 'vendor' %}
+    <div class="nav-section">
+      <span class="nav-label">Vendor</span>
+      <a href="{% url 'vendor_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'vendor_dashboard' %}active{% endif %}">
+        <span class="nav-icon"></span> My store
+      </a>
+      <a href="{% url 'panel_product_add' %}" class="nav-link {% if request.resolver_match.url_name == 'panel_product_add' %}active{% endif %}">
+        <span class="nav-icon"></span> Add product
+      </a>
+      <a href="{% url 'my_products' %}" class="nav-link {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}">
+        <span class="nav-icon"></span> My products
+      </a>
+      <a href="{% url 'manage_categories' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_categories' or request.resolver_match.url_name == 'category_add' or request.resolver_match.url_name == 'category_edit' %}active{% endif %}">
+        <span class="nav-icon"></span> Categories
+      </a>
+      <a href="{% url 'view_carts' %}" class="nav-link {% if request.resolver_match.url_name == 'view_carts' %}active{% endif %}">
+        <span class="nav-icon"></span> Customer Carts
+      </a>
+      <a href="{% url 'all_orders' %}" class="nav-link {% if request.resolver_match.url_name == 'all_orders' %}active{% endif %}">
+        <span class="nav-icon"></span> Orders
+      </a>
+      <a href="{% url 'manage_coupons' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_coupons' or request.resolver_match.url_name == 'coupon_add' or request.resolver_match.url_name == 'coupon_edit' %}active{% endif %}">
+        <span class="nav-icon"></span> Coupons
+      </a>
+    </div>
+    {% endif %}
+
+    <!-- ADMIN sidebar — no coupons here -->
+    {% if request.user.role == 'admin' %}
+    <div class="nav-section">
+      <span class="nav-label">Admin</span>
+      <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+        <span class="nav-icon"></span> Control panel
+      </a>
+      <a href="{% url 'manage_vendors' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_vendors' %}active{% endif %}">
+        <span class="nav-icon"></span> Manage vendors
+      </a>
+      <a href="{% url 'manage_users' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_users' %}active{% endif %}">
+        <span class="nav-icon"></span> All users
+      </a>
+      <a href="{% url 'all_orders' %}" class="nav-link {% if request.resolver_match.url_name == 'all_orders' %}active{% endif %}">
+        <span class="nav-icon"></span> All orders
+      </a>
+      <a href="{% url 'manage_categories' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_categories' or request.resolver_match.url_name == 'category_add' or request.resolver_match.url_name == 'category_edit' %}active{% endif %}">
+        <span class="nav-icon"></span> Categories
+      </a>
+      <a href="{% url 'my_products' %}" class="nav-link {% if request.resolver_match.url_name == 'my_products' %}active{% endif %}">
+        <span class="nav-icon"></span> Products
+      </a>
+      <a href="{% url 'view_carts' %}" class="nav-link {% if request.resolver_match.url_name == 'view_carts' %}active{% endif %}">
+        <span class="nav-icon"></span> Customer Carts
+      </a>
+    </div>
+    {% endif %}
+
+  </nav>
+
+  <div class="sidebar-footer">
+    <form method="post" action="{% url 'panel_logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn">
+        <span></span> Sign out
+      </button>
+    </form>
+  </div>
+</aside>
+
+<div class="layout-wrap">
+
+  <header class="topbar">
+    <button class="menu-toggle" id="menuToggle" aria-label="Open sidebar">☰</button>
+    <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+    <div class="topbar-right">
+      {% if request.user.role == 'vendor' and not request.user.is_approved %}
+        <span class="status-pill status-pill--warning">⏳ Pending approval</span>
+      {% endif %}
+      <span class="topbar-avatar">{{ request.user.username|first|upper }}</span>
+    </div>
+  </header>
+
+  {% if messages %}
+  <div class="messages-wrap" role="alert">
+    {% for message in messages %}
+    <div class="flash flash--{{ message.tags }}">
+      <span>{{ message }}</span>
+      <button onclick="this.parentElement.remove()" aria-label="Dismiss">✕</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<script src="{% static 'custom_admin_templates/js/panel.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

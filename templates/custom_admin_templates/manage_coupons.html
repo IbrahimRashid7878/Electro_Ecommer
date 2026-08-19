@@ -1,0 +1,113 @@
+{% extends 'custom_admin_templates/base.html' %}
+{% load static %}
+
+{% block title %}Coupons{% endblock %}
+{% block page_title %}Manage Coupons{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h2>All Coupons</h2>
+  <a href="{% url 'coupon_add' %}" class="btn btn-primary">+ Add Coupon</a>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Discount</th>
+          <th>Valid From</th>
+          <th>Valid To</th>
+          <th>Status</th>
+          <th>Currently Valid</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for coupon in coupons %}
+        <tr>
+
+          <!-- clicking code goes to edit page -->
+          <td>
+            <a href="{% url 'coupon_edit' coupon.id %}"
+               style="color:var(--accent); font-weight:600; letter-spacing:1px;">
+              {{ coupon.code }}
+            </a>
+          </td>
+
+          <td style="font-weight:600;">{{ coupon.discount_percent }}% off</td>
+
+          <td>{{ coupon.valid_from|date:"d M Y, H:i" }}</td>
+          <td>{{ coupon.valid_to|date:"d M Y, H:i" }}</td>
+
+          
+
+          <!-- active/inactive toggle switch -->
+<td>
+  <form method="post" action="{% url 'coupon_toggle' coupon.id %}">
+    {% csrf_token %}
+    <label style="display:inline-flex; align-items:center; cursor:pointer; gap:8px;">
+      <div style="position:relative; width:52px; height:28px;">
+        <!-- track -->
+        <div style="
+          width:52px; height:28px; border-radius:50px;
+          background: {% if coupon.active %}#22c55e{% else %}#ef4444{% endif %};
+          box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+          transition: background 0.3s;">
+        </div>
+        <!-- circle -->
+        <div style="
+          position:absolute;
+          top:3px;
+          left: {% if coupon.active %}27px{% else %}3px{% endif %};
+          width:22px; height:22px; border-radius:50%;
+          background:white;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          transition: left 0.3s;">
+        </div>
+      </div>
+      <button type="submit"
+              style="background:none; border:none; cursor:pointer;
+                     font-size:0.8rem; color:var(--text-secondary); padding:0;">
+        {% if coupon.active %}Active{% else %}Inactive{% endif %}
+      </button>
+    </label>
+  </form>
+</td>
+
+          <!-- is_valid() checks active + date range -->
+          <td>
+            {% if coupon.is_valid %}
+              <span class="badge badge-green">✓ Valid now</span>
+            {% else %}
+              <span class="badge badge-amber">✗ Not valid</span>
+            {% endif %}
+          </td>
+
+          <!-- edit and delete -->
+          <td style="display:flex; gap:8px;">
+            <a href="{% url 'coupon_edit' coupon.id %}"
+               class="btn btn-outline btn-sm">Edit</a>
+            <form method="post" action="{% url 'coupon_delete' coupon.id %}"
+                  onsubmit="return confirm('Delete coupon {{ coupon.code }}?')">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="text-align:center; padding:28px; color:var(--text-secondary);">
+            No coupons yet. <a href="{% url 'coupon_add' %}">Add one</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

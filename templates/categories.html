@@ -1,0 +1,136 @@
+
+{% extends 'base.html' %}
+<title>{% block title %}SHOP{% endblock %}</title>
+{% load static %}
+
+{% block content %}
+
+		<!-- BREADCRUMB -->
+		<div id="breadcrumb" class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+					<div class="col-md-12">
+						<ul class="breadcrumb-tree">
+							<li><a href="#">Home</a></li>
+							<li><a href="#">All Categories</a></li>
+						</ul>
+					</div>
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /BREADCRUMB -->
+
+		<!-- SECTION -->
+		<div class="section">
+			<!-- container -->
+			<div class="container">
+				<!-- row -->
+				<div class="row">
+					<!-- ASIDE -->
+						<!-- aside Widget -->
+						
+						<!-- /store top filter -->
+
+						<!-- store products -->
+						
+						<div class="row">
+							<!-- product -->
+							{% if show_products %}
+							{% for product in products %}
+							<div class="col-md-4 col-xs-6">
+								<div class="product">
+									<div class="product-img">
+										<img src="{{ product.image.url }}" alt="{{ product.name }}">
+										<div class="product-label">
+											{% if product.has_discount %}
+												<span class="sale">-{{ product.discount_percent }}%</span>
+											{% endif %}
+
+											{% if product.is_new %}
+												<span class="new">NEW</span>
+											{% endif %}
+										</div>
+									</div>
+
+									<div class="product-body">
+										<p class="product-category">{{ product.category.name }}</p>
+
+										<h3 class="product-name">
+											<a href="#">{{ product.name }}</a>
+										</h3>
+
+										{% if product.has_discount %}
+											<h4 class="product-price">
+												RS {{ product.discounted_price }}
+												<del class="product-old-price">RS {{ product.price }}</del>
+											</h4>
+										{% else %}
+											<h4 class="product-price">RS {{ product.price }}</h4>
+										{% endif %}
+
+										<div class="product-rating">
+											<i class="fa fa-star"></i>
+											<i class="fa fa-star"></i>
+											<i class="fa fa-star"></i>
+											<i class="fa fa-star"></i>
+											<i class="fa fa-star"></i>
+										</div>
+
+										<div class="product-btns">
+											<button class="add-to-wishlist">
+												<i class="fa fa-heart-o"></i>
+											</button>
+											<button class="quick-view">
+												<i class="fa fa-eye"></i>
+											</button>
+										</div>
+									</div>
+
+									<div class="add-to-cart">
+										<button class="add-to-cart-btn">
+											<i class="fa fa-shopping-cart"></i> add to cart
+										</button>
+									</div>
+								</div>
+								
+							</div>
+							{% empty %}
+        <p>No products found in this category.</p>
+							{% endfor %}
+
+							<!-- /product -->
+
+						</div>
+						{% else %}
+							<!-- CATEGORIES VIEW -->
+							<h2 class="section-title">Browse Categories</h2>
+
+							<div class="category-grid">
+								{% for category in categories %}
+									<div class="category-card">
+										<a href="{% url 'shop' %}?category={{ category.name }}">
+											<h3>{{ category.name }}</h3>
+										</a>
+									</div>
+								{% endfor %}
+							</div>
+						{% endif %}
+						<!-- /store products -->
+
+						<!-- store bottom filter -->
+						
+						<!-- /store bottom filter -->
+					</div>
+					<!-- /STORE -->
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /container -->
+		</div>
+		<!-- /SECTION -->
+
+{% endblock %}
